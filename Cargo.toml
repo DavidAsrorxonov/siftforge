@@ -1,6 +1,25 @@
 [package]
 name = "siftforge"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
+rust-version="1.80"
+description="A safe, cross-platform CLI for organizing cluttered directories."
+license="MIT"
+keywords=["cli", "files", "organizer", "downloads", "filesystem"]
+categories=["command-line-utilities", "filesystem"]
+
+[[bin]]
+name="siftforge"
+path="src/main.rs"
 
 [dependencies]
+clap = { version = "4", features = ["derive"] }
+
+[dev-dependencies]
+tempfile = "3"
+assert_fs = "1"
+predicates = "3"
+
+[profile.release]
+lto = true
+strip = true

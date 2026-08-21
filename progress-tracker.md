@@ -30,18 +30,20 @@ Phase 0 - Repository Foundation
   - `tempfile`, `assert_fs`, and `predicates` for future tests
 - Set Rust edition to 2021 and declared MSRV as Rust 1.80.
 - Added release profile settings with LTO and symbol stripping.
+- Added initial `clap` CLI skeleton in `src/main.rs`.
+- Verified `--help`, preview mode, and `--apply` mode run successfully.
+- Ran `cargo fmt`, `cargo check`, and verified `--version` output.
 
 ## In Progress
 
-- Step 3 - CLI skeleton.
+- Step 4 - Scanner module.
 
 ## Next Steps
 
-1. Add initial CLI skeleton with `clap`.
-2. Add basic `--help` and `--version` support.
+1. Add first scanner module.
+2. Wire CLI to validate and scan the target directory.
 3. Add formatting and lint configuration.
-4. Add first scanner module.
-5. Add initial CI once the repository is connected to GitHub.
+4. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -64,6 +66,13 @@ Phase 0 - Repository Foundation
 - Updated `Cargo.toml` for project metadata and initial dependencies.
 - Ran `cargo check`; completed successfully.
 - Ran `cargo build`; completed successfully after dependency compilation.
+- Added initial CLI skeleton.
+- Ran `cargo run -- --help`; help output renders successfully after fixing the `--apply` flag attribute and description typo.
+- Ran `cargo run -- .`; preview mode output works.
+- Ran `cargo run -- . --apply`; apply mode output works.
+- Ran `cargo fmt`; completed successfully.
+- Ran `cargo check`; completed successfully.
+- Ran `cargo run -- --version`; output is `siftforge 0.1.0`.
 
 ## Known Issues / Open Items
 

@@ -1,0 +1,28 @@
+# Rust build output
+/target/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor and IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Local logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+sessions/
+siftforge-build-blueprint-rust.md

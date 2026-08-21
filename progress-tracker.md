@@ -33,15 +33,18 @@ Phase 0 - Repository Foundation
 - Added initial `clap` CLI skeleton in `src/main.rs`.
 - Verified `--help`, preview mode, and `--apply` mode run successfully.
 - Ran `cargo fmt`, `cargo check`, and verified `--version` output.
+- Added initial `scanner` module.
+- Scanner now reads direct child entries, collects regular files, and skips directories, hidden names, system metadata, incomplete downloads, and non-regular files.
+- CLI now calls the scanner and prints found/skipped entries for early verification.
 
 ## In Progress
 
-- Step 4 - Scanner module.
+- Step 5 - Classifier module.
 
 ## Next Steps
 
-1. Add first scanner module.
-2. Wire CLI to validate and scan the target directory.
+1. Add built-in extension classifier.
+2. Wire scanned files into classification output.
 3. Add formatting and lint configuration.
 4. Add initial CI once the repository is connected to GitHub.
 
@@ -73,6 +76,9 @@ Phase 0 - Repository Foundation
 - Ran `cargo fmt`; completed successfully.
 - Ran `cargo check`; completed successfully.
 - Ran `cargo run -- --version`; output is `siftforge 0.1.0`.
+- Added `src/scanner/mod.rs`.
+- Ran `cargo check`; scanner compiles with no warnings after adding readable skip-reason messages.
+- Ran `cargo run -- .`; scanner reports found files and skipped entries correctly.
 
 ## Known Issues / Open Items
 

@@ -45,6 +45,9 @@ Phase 0 - Repository Foundation
 - Added initial `planner` module structure with `ConflictResolution`, `PlannedMove`, and `OrganizationPlan` types.
 - Added basic preview-only plan builder from scanner output and classifier categories.
 - CLI now prints planned category directories and planned file moves.
+- Added conflict-safe destination-name generation.
+- Conflict handling now preserves compound extensions such as `.tar.gz`.
+- Added planner tests for no-conflict paths, simple rename conflicts, incremented conflicts, and compound-extension conflicts.
 
 ## In Progress
 
@@ -52,10 +55,9 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add conflict-safe destination-name generation.
-2. Display conflict resolution in plan output.
-3. Add formatting and lint configuration.
-4. Add initial CI once the repository is connected to GitHub.
+1. Display conflict resolution in plan output.
+2. Add formatting and lint configuration.
+3. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -105,6 +107,9 @@ Phase 0 - Repository Foundation
 - Added `planner::build_plan`.
 - Ran `cargo check`; completed with one expected warning because `ConflictResolution::Renamed` is not used yet.
 - Ran `cargo run -- .`; CLI prints directories that would be created, planned moves, and skipped entries.
+- Added `planner::resolve_available_destination`.
+- Ran `cargo test`; 13 tests passed.
+- Ran `cargo check`; completed successfully with no warnings.
 
 ## Known Issues / Open Items
 

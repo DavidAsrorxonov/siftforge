@@ -66,8 +66,8 @@ fn main() {
                         plan.target_directory.display()
                     );
                 } else {
-                    println!();
-                    println!("Apply mode is not implemented yet.");
+                    eprintln!("Apply mode is not implemented yet.");
+                    std::process::exit(1);
                 }
             }
             Err(error) => {

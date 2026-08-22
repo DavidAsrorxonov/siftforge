@@ -54,6 +54,9 @@ Phase 0 - Repository Foundation
 - Replaced raw move listing with cleaner preview summary output.
 - Preview output now reports category counts, move count, directory creation count, skipped entries, and conflict rename count.
 - Temporary `--apply` branch now reports that apply mode is not implemented and exits with code `1`.
+- Added initial `executor` module structure with execution result, executed move, and failure types.
+- Added executor directory creation function.
+- Added executor tests for creating missing directories and ignoring existing directories.
 
 ## In Progress
 
@@ -61,12 +64,11 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add executor module structure.
-2. Implement directory creation and safe file moves.
-3. Wire `--apply` to executor.
-4. Add executor tests with temporary directories.
-5. Add formatting and lint configuration.
-6. Add initial CI once the repository is connected to GitHub.
+1. Implement safe file moves.
+2. Wire `--apply` to executor.
+3. Add executor tests with temporary directories.
+4. Add formatting and lint configuration.
+5. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -130,6 +132,11 @@ Phase 0 - Repository Foundation
 - Ran `cargo run -- . --apply`; apply branch reports that apply mode is not implemented yet.
 - Updated temporary `--apply` behavior to print to stderr and exit with code `1`.
 - Verified `cargo run -- . --apply` exits with code `1` as expected.
+- Added `src/executor/mod.rs`.
+- Ran `cargo check`; executor types compile with expected unused-code warnings because execution is not wired in yet.
+- Added `executor::create_plan_directories`.
+- Ran `cargo test`; 17 tests passed.
+- Ran `cargo check`; completed with expected unused-code warnings because file moving is not wired in yet.
 
 ## Known Issues / Open Items
 

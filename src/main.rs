@@ -1,3 +1,4 @@
+mod classifier;
 mod scanner;
 
 use clap::Parser;

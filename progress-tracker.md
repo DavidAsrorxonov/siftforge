@@ -36,6 +36,11 @@ Phase 0 - Repository Foundation
 - Added initial `scanner` module.
 - Scanner now reads direct child entries, collects regular files, and skips directories, hidden names, system metadata, incomplete downloads, and non-regular files.
 - CLI now calls the scanner and prints found/skipped entries for early verification.
+- Added initial `classifier` module structure with `Category` and `Classification` types.
+- Added `detect_extension` helper with support for lowercase simple extensions and compound archive extensions.
+- Added unit tests for simple extensions, compound extensions, missing extensions, and empty extensions.
+- Added built-in extension-to-category classifier.
+- Added classifier tests for images, documents, compound archives, unknown extensions, and files without extensions.
 
 ## In Progress
 
@@ -43,10 +48,9 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add built-in extension classifier.
-2. Wire scanned files into classification output.
-3. Add formatting and lint configuration.
-4. Add initial CI once the repository is connected to GitHub.
+1. Wire scanned files into classification output.
+2. Add formatting and lint configuration.
+3. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -79,6 +83,15 @@ Phase 0 - Repository Foundation
 - Added `src/scanner/mod.rs`.
 - Ran `cargo check`; scanner compiles with no warnings after adding readable skip-reason messages.
 - Ran `cargo run -- .`; scanner reports found files and skipped entries correctly.
+- Added `src/classifier/mod.rs`.
+- Ran `cargo check`; classifier structure compiles with expected dead-code warnings because the types are not wired into the CLI yet.
+
+### 2026-08-22
+
+- Added classifier extension detection helper.
+- Ran `cargo test`; 4 classifier tests passed.
+- Added built-in classifier mapping.
+- Ran `cargo test`; 9 classifier tests passed.
 
 ## Known Issues / Open Items
 

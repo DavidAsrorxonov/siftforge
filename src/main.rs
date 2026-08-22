@@ -29,7 +29,14 @@ fn main() {
                 println!("Found {} files.", result.files.len());
 
                 for file in &result.files {
-                    println!("  file: {} ({})", file.name, file.path.display());
+                    let classification = classifier::classify_file_name(&file.name);
+
+                    println!(
+                        "    file: {} -> {} ({})",
+                        file.name,
+                        classification.category.folder_name(),
+                        file.path.display()
+                    )
                 }
 
                 println!("Skipped {} entries.", result.skipped.len());

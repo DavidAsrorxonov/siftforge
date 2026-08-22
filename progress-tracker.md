@@ -53,16 +53,20 @@ Phase 0 - Repository Foundation
 - Added tests for category summary counts and conflict rename counts.
 - Replaced raw move listing with cleaner preview summary output.
 - Preview output now reports category counts, move count, directory creation count, skipped entries, and conflict rename count.
+- Temporary `--apply` branch now reports that apply mode is not implemented and exits with code `1`.
 
 ## In Progress
 
-- Step 7 - Preview output.
+- Step 8 - Apply executor.
 
 ## Next Steps
 
-1. Review preview wording against the blueprint.
-2. Add formatting and lint configuration.
-3. Add initial CI once the repository is connected to GitHub.
+1. Add executor module structure.
+2. Implement directory creation and safe file moves.
+3. Wire `--apply` to executor.
+4. Add executor tests with temporary directories.
+5. Add formatting and lint configuration.
+6. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -124,6 +128,8 @@ Phase 0 - Repository Foundation
 - Ran `cargo check`; completed successfully with no warnings.
 - Ran `cargo run -- .`; clean preview summary renders successfully.
 - Ran `cargo run -- . --apply`; apply branch reports that apply mode is not implemented yet.
+- Updated temporary `--apply` behavior to print to stderr and exit with code `1`.
+- Verified `cargo run -- . --apply` exits with code `1` as expected.
 
 ## Known Issues / Open Items
 

@@ -48,16 +48,19 @@ Phase 0 - Repository Foundation
 - Added conflict-safe destination-name generation.
 - Conflict handling now preserves compound extensions such as `.tar.gz`.
 - Added planner tests for no-conflict paths, simple rename conflicts, incremented conflicts, and compound-extension conflicts.
+- CLI now displays when a planned move was renamed to avoid a destination conflict.
 
 ## In Progress
 
-- Step 6 - Planner and conflict handling.
+- Step 7 - Preview output.
 
 ## Next Steps
 
-1. Display conflict resolution in plan output.
-2. Add formatting and lint configuration.
-3. Add initial CI once the repository is connected to GitHub.
+1. Replace raw move listing with a cleaner preview summary.
+2. Group planned moves by category.
+3. Report moved/skipped/conflict counts.
+4. Add formatting and lint configuration.
+5. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -110,6 +113,8 @@ Phase 0 - Repository Foundation
 - Added `planner::resolve_available_destination`.
 - Ran `cargo test`; 13 tests passed.
 - Ran `cargo check`; completed successfully with no warnings.
+- Updated CLI output to mark conflict-renamed planned moves.
+- Manually verified conflict display by creating a destination collision and confirming the planned destination used a safe renamed path.
 
 ## Known Issues / Open Items
 

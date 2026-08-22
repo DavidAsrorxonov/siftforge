@@ -49,6 +49,8 @@ Phase 0 - Repository Foundation
 - Conflict handling now preserves compound extensions such as `.tar.gz`.
 - Added planner tests for no-conflict paths, simple rename conflicts, incremented conflicts, and compound-extension conflicts.
 - CLI now displays when a planned move was renamed to avoid a destination conflict.
+- Added `OrganizationPlan::category_counts` and `OrganizationPlan::conflict_rename_count`.
+- Added tests for category summary counts and conflict rename counts.
 
 ## In Progress
 
@@ -57,10 +59,9 @@ Phase 0 - Repository Foundation
 ## Next Steps
 
 1. Replace raw move listing with a cleaner preview summary.
-2. Group planned moves by category.
-3. Report moved/skipped/conflict counts.
-4. Add formatting and lint configuration.
-5. Add initial CI once the repository is connected to GitHub.
+2. Report moved/skipped/conflict counts.
+3. Add formatting and lint configuration.
+4. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -115,6 +116,9 @@ Phase 0 - Repository Foundation
 - Ran `cargo check`; completed successfully with no warnings.
 - Updated CLI output to mark conflict-renamed planned moves.
 - Manually verified conflict display by creating a destination collision and confirming the planned destination used a safe renamed path.
+- Added plan summary helper methods.
+- Ran `cargo test`; 15 tests passed.
+- Ran `cargo check`; completed with expected unused-method warning because summary helpers are not wired into CLI output yet.
 
 ## Known Issues / Open Items
 

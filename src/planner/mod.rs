@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 use crate::classifier;
@@ -25,6 +26,27 @@ pub struct OrganizationPlan {
     pub directories_to_create: Vec<PathBuf>,
     pub moves: Vec<PlannedMove>,
     pub skipped: Vec<SkippedEntry>,
+}
+
+impl OrganizationPlan {
+    pub fn category_counts(&self) -> BTreeMap<&'static str, usize> {
+        let mut counts = BTreeMap::new();
+
+        for planned_move in &self.moves {
+            let cateogry_name = planned_move.category.folder_name();
+            let count = counts.entry(cateogry_name).or_insert(0);
+            *count += 1;
+        }
+
+        counts
+    }
+
+    pub fn conflict_rename_count(&self) -> usize {
+        self.moves
+            .iter()
+            .filter(|planned_move| planned_move.conflict_resolution == ConflictResolution::Renamed)
+            .count()
+    }
 }
 
 pub fn build_plan(target_directory: PathBuf, scan_result: ScanResult) -> OrganizationPlan {
@@ -110,7 +132,10 @@ fn split_file_name_for_conflict(file_name: &str) -> (&str, Option<&str>) {
 #[cfg(test)]
 mod tests {
     use super::{resolve_available_destination, ConflictResolution};
+    use super::{OrganizationPlan, PlannedMove};
+    use crate::classifier::Category;
     use std::fs;
+    use std::path::PathBuf;
 
     #[test]
     fn keeps_destination_when_no_conflict_exists() {
@@ -161,5 +186,64 @@ mod tests {
 
         assert_eq!(resolved.file_name().unwrap(), "backup (1).tar.gz");
         assert_eq!(conflict_resolution, ConflictResolution::Renamed);
+    }
+
+    #[test]
+    fn counts_moves_by_category() {
+        let plan = OrganizationPlan {
+            target_directory: PathBuf::from("."),
+            directories_to_create: Vec::new(),
+            moves: vec![
+                PlannedMove {
+                    source_path: PathBuf::from("photo.png"),
+                    destination_path: PathBuf::from("Images/photo.png"),
+                    category: Category::Images,
+                    conflict_resolution: ConflictResolution::None,
+                },
+                PlannedMove {
+                    source_path: PathBuf::from("notes.md"),
+                    destination_path: PathBuf::from("Documents/notes.md"),
+                    category: Category::Documents,
+                    conflict_resolution: ConflictResolution::None,
+                },
+                PlannedMove {
+                    source_path: PathBuf::from("report.pdf"),
+                    destination_path: PathBuf::from("Documents/report.pdf"),
+                    category: Category::Documents,
+                    conflict_resolution: ConflictResolution::Renamed,
+                },
+            ],
+            skipped: Vec::new(),
+        };
+
+        let counts = plan.category_counts();
+
+        assert_eq!(counts.get("Images"), Some(&1));
+        assert_eq!(counts.get("Documents"), Some(&2));
+    }
+
+    #[test]
+    fn counts_conflict_renames() {
+        let plan = OrganizationPlan {
+            target_directory: PathBuf::from("."),
+            directories_to_create: Vec::new(),
+            moves: vec![
+                PlannedMove {
+                    source_path: PathBuf::from("notes.md"),
+                    destination_path: PathBuf::from("Documents/notes.md"),
+                    category: Category::Documents,
+                    conflict_resolution: ConflictResolution::None,
+                },
+                PlannedMove {
+                    source_path: PathBuf::from("report.pdf"),
+                    destination_path: PathBuf::from("Documents/report (1).pdf"),
+                    category: Category::Documents,
+                    conflict_resolution: ConflictResolution::Renamed,
+                },
+            ],
+            skipped: Vec::new(),
+        };
+
+        assert_eq!(plan.conflict_rename_count(), 1);
     }
 }

@@ -1,4 +1,5 @@
 mod classifier;
+mod planner;
 mod scanner;
 
 use clap::Parser;
@@ -24,29 +25,39 @@ fn main() {
         Some(directory) => match scanner::scan_directory(&directory) {
             Ok(result) => {
                 let mode = if cli.apply { "Apply" } else { "Preview" };
+                let plan = planner::build_plan(directory.clone(), result);
 
-                println!("{mode} mode selected for: {}", directory.display());
-                println!("Found {} files.", result.files.len());
+                println!(
+                    "{mode} mode selected for: {}",
+                    plan.target_directory.display()
+                );
+                println!(
+                    "{} directories would be created.",
+                    plan.directories_to_create.len()
+                );
 
-                for file in &result.files {
-                    let classification = classifier::classify_file_name(&file.name);
+                for directory in &plan.directories_to_create {
+                    println!("   create: {}", directory.display());
+                }
 
+                println!("{} files would be moved.", plan.moves.len());
+
+                for planned_move in &plan.moves {
                     println!(
-                        "    file: {} -> {} ({})",
-                        file.name,
-                        classification.category.folder_name(),
-                        file.path.display()
+                        "    move: {} -> {}",
+                        planned_move.source_path.display(),
+                        planned_move.destination_path.display()
                     )
                 }
 
-                println!("Skipped {} entries.", result.skipped.len());
+                println!("{} entries skipped.", plan.skipped.len());
 
-                for skipped in &result.skipped {
+                for skipped in &plan.skipped {
                     println!(
-                        "  skipped: {} ({})",
+                        "    skipped: {} ({})",
                         skipped.name,
                         skipped.reason.as_message()
-                    );
+                    )
                 }
             }
             Err(error) => {

@@ -41,16 +41,21 @@ Phase 0 - Repository Foundation
 - Added unit tests for simple extensions, compound extensions, missing extensions, and empty extensions.
 - Added built-in extension-to-category classifier.
 - Added classifier tests for images, documents, compound archives, unknown extensions, and files without extensions.
+- Wired classifier into CLI scan output.
+- Added initial `planner` module structure with `ConflictResolution`, `PlannedMove`, and `OrganizationPlan` types.
+- Added basic preview-only plan builder from scanner output and classifier categories.
+- CLI now prints planned category directories and planned file moves.
 
 ## In Progress
 
-- Step 5 - Classifier module.
+- Step 6 - Planner and conflict handling.
 
 ## Next Steps
 
-1. Wire scanned files into classification output.
-2. Add formatting and lint configuration.
-3. Add initial CI once the repository is connected to GitHub.
+1. Add conflict-safe destination-name generation.
+2. Display conflict resolution in plan output.
+3. Add formatting and lint configuration.
+4. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -92,6 +97,14 @@ Phase 0 - Repository Foundation
 - Ran `cargo test`; 4 classifier tests passed.
 - Added built-in classifier mapping.
 - Ran `cargo test`; 9 classifier tests passed.
+- Wired classifier into `src/main.rs`.
+- Ran `cargo check`; completed successfully.
+- Ran `cargo run -- .`; files are displayed with detected destination categories.
+- Added `src/planner/mod.rs`.
+- Ran `cargo check`; planner types compile with expected unused-code warnings because they are not wired in yet.
+- Added `planner::build_plan`.
+- Ran `cargo check`; completed with one expected warning because `ConflictResolution::Renamed` is not used yet.
+- Ran `cargo run -- .`; CLI prints directories that would be created, planned moves, and skipped entries.
 
 ## Known Issues / Open Items
 

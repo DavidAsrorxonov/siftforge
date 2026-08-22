@@ -3,6 +3,7 @@ mod planner;
 mod scanner;
 
 use clap::Parser;
+use planner::ConflictResolution;
 use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
@@ -43,11 +44,22 @@ fn main() {
                 println!("{} files would be moved.", plan.moves.len());
 
                 for planned_move in &plan.moves {
-                    println!(
-                        "    move: {} -> {}",
-                        planned_move.source_path.display(),
-                        planned_move.destination_path.display()
-                    )
+                    match planned_move.conflict_resolution {
+                        ConflictResolution::None => {
+                            println!(
+                                "    move: {} -> {}",
+                                planned_move.source_path.display(),
+                                planned_move.destination_path.display()
+                            );
+                        }
+                        ConflictResolution::Renamed => {
+                            println!(
+                                "    move: {} -> {} (renamed to avoid conflict)",
+                                planned_move.source_path.display(),
+                                planned_move.destination_path.display()
+                            );
+                        }
+                    }
                 }
 
                 println!("{} entries skipped.", plan.skipped.len());

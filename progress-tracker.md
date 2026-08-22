@@ -51,6 +51,8 @@ Phase 0 - Repository Foundation
 - CLI now displays when a planned move was renamed to avoid a destination conflict.
 - Added `OrganizationPlan::category_counts` and `OrganizationPlan::conflict_rename_count`.
 - Added tests for category summary counts and conflict rename counts.
+- Replaced raw move listing with cleaner preview summary output.
+- Preview output now reports category counts, move count, directory creation count, skipped entries, and conflict rename count.
 
 ## In Progress
 
@@ -58,10 +60,9 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Replace raw move listing with a cleaner preview summary.
-2. Report moved/skipped/conflict counts.
-3. Add formatting and lint configuration.
-4. Add initial CI once the repository is connected to GitHub.
+1. Review preview wording against the blueprint.
+2. Add formatting and lint configuration.
+3. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -119,6 +120,10 @@ Phase 0 - Repository Foundation
 - Added plan summary helper methods.
 - Ran `cargo test`; 15 tests passed.
 - Ran `cargo check`; completed with expected unused-method warning because summary helpers are not wired into CLI output yet.
+- Updated CLI preview summary output.
+- Ran `cargo check`; completed successfully with no warnings.
+- Ran `cargo run -- .`; clean preview summary renders successfully.
+- Ran `cargo run -- . --apply`; apply branch reports that apply mode is not implemented yet.
 
 ## Known Issues / Open Items
 

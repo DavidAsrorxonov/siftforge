@@ -28,8 +28,11 @@ fn applies_full_scan_plan_and_move_pipeline() {
     assert!(directory_result.failures.is_empty());
     assert!(move_result.failures.is_empty());
 
-    assert_eq!(fs::read_to_string(root.join("Images").join("photo.png")).unwrap(), "image");
-     assert_eq!(
+    assert_eq!(
+        fs::read_to_string(root.join("Images").join("photo.png")).unwrap(),
+        "image"
+    );
+    assert_eq!(
         fs::read_to_string(root.join("Documents").join("report (1).pdf")).unwrap(),
         "new report"
     );

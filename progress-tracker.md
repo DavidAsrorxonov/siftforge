@@ -57,6 +57,10 @@ Phase 0 - Repository Foundation
 - Added initial `executor` module structure with execution result, executed move, and failure types.
 - Added executor directory creation function.
 - Added executor tests for creating missing directories and ignoring existing directories.
+- Added executor safe file move function.
+- Added executor tests for moving a planned file, refusing to overwrite an existing destination, and recording missing-source failures.
+- Wired `--apply` to executor directory creation and safe file move execution.
+- Manually verified apply behavior against `/Users/dovudxonasrorxonov/Desktop/Workspace/Testing/siftforge-directory-testing`.
 
 ## In Progress
 
@@ -64,11 +68,10 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Implement safe file moves.
-2. Wire `--apply` to executor.
-3. Add executor tests with temporary directories.
-4. Add formatting and lint configuration.
-5. Add initial CI once the repository is connected to GitHub.
+1. Add combined apply result output polish.
+2. Add integration-style tests with temporary directories.
+3. Add formatting and lint configuration.
+4. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -137,6 +140,12 @@ Phase 0 - Repository Foundation
 - Added `executor::create_plan_directories`.
 - Ran `cargo test`; 17 tests passed.
 - Ran `cargo check`; completed with expected unused-code warnings because file moving is not wired in yet.
+- Added `executor::execute_plan_moves`.
+- Fixed `ExecutionResult::moved_files` to store `ExecutedMove` values.
+- Ran `cargo test`; 20 tests passed.
+- Wired `--apply` in `src/main.rs` to create directories and execute planned moves.
+- Manually tested apply with loose files, pre-existing category folders, hidden files, incomplete downloads, and a destination conflict.
+- Verified `report2.pdf` was moved to `Documents/report2 (1).pdf` when `Documents/report2.pdf` already existed.
 
 ## Known Issues / Open Items
 

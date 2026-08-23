@@ -67,8 +67,45 @@ fn main() {
                         plan.target_directory.display()
                     );
                 } else {
-                    eprintln!("Apply mode is not implemented yet.");
-                    std::process::exit(1);
+                    println!();
+                    println!("Applying organization plan...");
+
+                    let directory_result = executor::create_plan_directories(&plan);
+                    let move_result = executor::execute_plan_moves(&plan);
+
+                    for directory in &directory_result.created_directories {
+                        println!("  created: {}", directory.display());
+                    }
+
+                    for moved_file in &move_result.moved_files {
+                        println!(
+                            "  moved: {} -> {}",
+                            moved_file.source_path.display(),
+                            moved_file.destination_path.display()
+                        );
+                    }
+
+                    for failure in directory_result
+                        .failures
+                        .iter()
+                        .chain(move_result.failures.iter())
+                    {
+                        eprintln!(
+                            "  failed: {} ({})",
+                            failure.source_path.display(),
+                            failure.reason
+                        );
+                    }
+
+                    let failure_count =
+                        directory_result.failures.len() + move_result.failures.len();
+
+                    if failure_count > 0 {
+                        eprintln!("Apply completed with {failure_count} failure(s).");
+                        std::process::exit(6)
+                    }
+
+                    println!("Completed successfully.")
                 }
             }
             Err(error) => {

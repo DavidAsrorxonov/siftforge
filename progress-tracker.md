@@ -64,16 +64,20 @@ Phase 0 - Repository Foundation
 - Apply output now reads moved-file conflict resolution, failure destination paths, and result failure helpers so `cargo check` is warning-free.
 - Added `src/lib.rs` and moved reusable modules behind the library crate API for integration testing.
 - Added full scan-plan-apply integration test in `tests/apply_pipeline.rs`.
+- Completed final manual Step 8 verification using the external test directory.
 
 ## In Progress
 
-- Step 8 - Apply executor.
+- Step 9 - History and undo.
 
 ## Next Steps
 
-1. Run final Step 8 verification pass.
-2. Add formatting and lint configuration.
-3. Add initial CI once the repository is connected to GitHub.
+1. Add operation history data structures.
+2. Write successful apply operations to local history.
+3. Add `history` command.
+4. Add `undo` command.
+5. Add formatting and lint configuration.
+6. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -155,6 +159,9 @@ Phase 0 - Repository Foundation
 - Updated `src/main.rs` to import modules through the `siftforge` library crate.
 - Added `tests/apply_pipeline.rs`.
 - Ran `cargo test`; 20 unit tests and 1 integration test passed.
+- Ran final manual apply check with `final-check.png`.
+- Verified `final-check.png` was moved to `Images/final-check.png`.
+- Verified hidden files and incomplete downloads remained untouched.
 
 ## Known Issues / Open Items
 

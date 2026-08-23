@@ -62,6 +62,8 @@ Phase 0 - Repository Foundation
 - Wired `--apply` to executor directory creation and safe file move execution.
 - Manually verified apply behavior against `/Users/dovudxonasrorxonov/Desktop/Workspace/Testing/siftforge-directory-testing`.
 - Apply output now reads moved-file conflict resolution, failure destination paths, and result failure helpers so `cargo check` is warning-free.
+- Added `src/lib.rs` and moved reusable modules behind the library crate API for integration testing.
+- Added full scan-plan-apply integration test in `tests/apply_pipeline.rs`.
 
 ## In Progress
 
@@ -69,7 +71,7 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add integration-style tests with temporary directories.
+1. Run final Step 8 verification pass.
 2. Add formatting and lint configuration.
 3. Add initial CI once the repository is connected to GitHub.
 
@@ -149,6 +151,10 @@ Phase 0 - Repository Foundation
 - Updated apply output to show renamed moves and detailed failure destination paths.
 - Ran `cargo check`; completed successfully with no warnings.
 - Ran `cargo test`; all tests passed.
+- Created `src/lib.rs` exposing `classifier`, `executor`, `planner`, and `scanner`.
+- Updated `src/main.rs` to import modules through the `siftforge` library crate.
+- Added `tests/apply_pipeline.rs`.
+- Ran `cargo test`; 20 unit tests and 1 integration test passed.
 
 ## Known Issues / Open Items
 

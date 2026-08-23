@@ -4,6 +4,7 @@ mod planner;
 mod scanner;
 
 use clap::Parser;
+use planner::ConflictResolution;
 use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
@@ -38,6 +39,7 @@ fn main() {
                 }
 
                 println!();
+                println!("{} files would be moved.", plan.moves.len());
                 println!(
                     "{} directories would be created.",
                     plan.directories_to_create.len()
@@ -78,11 +80,22 @@ fn main() {
                     }
 
                     for moved_file in &move_result.moved_files {
-                        println!(
-                            "  moved: {} -> {}",
-                            moved_file.source_path.display(),
-                            moved_file.destination_path.display()
-                        );
+                        match moved_file.conflict_resolution {
+                            ConflictResolution::None => {
+                                println!(
+                                    "  moved: {} -> {}",
+                                    moved_file.source_path.display(),
+                                    moved_file.destination_path.display()
+                                );
+                            }
+                            ConflictResolution::Renamed => {
+                                println!(
+                                    "  moved: {} -> {} (renamed to avoid conflict)",
+                                    moved_file.source_path.display(),
+                                    moved_file.destination_path.display()
+                                )
+                            }
+                        }
                     }
 
                     for failure in directory_result
@@ -90,17 +103,29 @@ fn main() {
                         .iter()
                         .chain(move_result.failures.iter())
                     {
-                        eprintln!(
-                            "  failed: {} ({})",
-                            failure.source_path.display(),
-                            failure.reason
-                        );
+                        match &failure.destination_path {
+                            Some(destination_path) => {
+                                eprintln!(
+                                    "  failed: {} -> {} ({})",
+                                    failure.source_path.display(),
+                                    destination_path.display(),
+                                    failure.reason
+                                );
+                            }
+                            None => {
+                                eprintln!(
+                                    "  failed: {} ({})",
+                                    failure.source_path.display(),
+                                    failure.reason
+                                );
+                            }
+                        }
                     }
 
                     let failure_count =
                         directory_result.failures.len() + move_result.failures.len();
 
-                    if failure_count > 0 {
+                    if directory_result.has_failures() || move_result.has_failures() {
                         eprintln!("Apply completed with {failure_count} failure(s).");
                         std::process::exit(6)
                     }

@@ -1,10 +1,8 @@
-mod classifier;
-mod executor;
-mod planner;
-mod scanner;
-
 use clap::Parser;
-use planner::ConflictResolution;
+use siftforge::executor;
+use siftforge::planner;
+use siftforge::planner::ConflictResolution;
+use siftforge::scanner;
 use std::path::PathBuf;
 
 #[derive(Debug, Parser)]

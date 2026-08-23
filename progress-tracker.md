@@ -61,6 +61,7 @@ Phase 0 - Repository Foundation
 - Added executor tests for moving a planned file, refusing to overwrite an existing destination, and recording missing-source failures.
 - Wired `--apply` to executor directory creation and safe file move execution.
 - Manually verified apply behavior against `/Users/dovudxonasrorxonov/Desktop/Workspace/Testing/siftforge-directory-testing`.
+- Apply output now reads moved-file conflict resolution, failure destination paths, and result failure helpers so `cargo check` is warning-free.
 
 ## In Progress
 
@@ -68,10 +69,9 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add combined apply result output polish.
-2. Add integration-style tests with temporary directories.
-3. Add formatting and lint configuration.
-4. Add initial CI once the repository is connected to GitHub.
+1. Add integration-style tests with temporary directories.
+2. Add formatting and lint configuration.
+3. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -146,6 +146,9 @@ Phase 0 - Repository Foundation
 - Wired `--apply` in `src/main.rs` to create directories and execute planned moves.
 - Manually tested apply with loose files, pre-existing category folders, hidden files, incomplete downloads, and a destination conflict.
 - Verified `report2.pdf` was moved to `Documents/report2 (1).pdf` when `Documents/report2.pdf` already existed.
+- Updated apply output to show renamed moves and detailed failure destination paths.
+- Ran `cargo check`; completed successfully with no warnings.
+- Ran `cargo test`; all tests passed.
 
 ## Known Issues / Open Items
 

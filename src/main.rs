@@ -4,6 +4,7 @@ use siftforge::history;
 use siftforge::planner;
 use siftforge::planner::ConflictResolution;
 use siftforge::scanner;
+use siftforge::undo;
 use std::path::PathBuf;
 
 #[derive(Debug, Parser)]
@@ -26,6 +27,9 @@ struct Cli {
 enum Command {
     /// Show recent SiftForge operations.
     History,
+
+    /// Undo the latest SiftForge operation.
+    Undo,
 }
 
 fn main() {
@@ -62,6 +66,76 @@ fn main() {
                     Err(error) => {
                         eprintln!("Failed to read history: {error}");
                         std::process::exit(1)
+                    }
+                }
+
+                return;
+            }
+            Command::Undo => {
+                match history::default_history_dir().and_then(|history_dir| {
+                    let record = history::latest_operation_record_from_dir(&history_dir)?
+                        .ok_or_else(|| {
+                            std::io::Error::new(
+                                std::io::ErrorKind::NotFound,
+                                "no operation history found",
+                            )
+                        })?;
+
+                    Ok((record, history_dir))
+                }) {
+                    Ok((record, _history_dir)) => {
+                        println!("Undoing operation: {}", record.id);
+                        println!();
+
+                        let undo_result = undo::undo_operation(&record);
+
+                        for restored_file in &undo_result.restored_files {
+                            println!(
+                                "  restored: {} -> {}",
+                                restored_file.from_path.display(),
+                                restored_file.to_path.display()
+                            );
+                        }
+
+                        for skipped_file in &undo_result.skipped_files {
+                            eprintln!(
+                                "  skipped: {} -> {} ({})",
+                                skipped_file.from_path.display(),
+                                skipped_file.to_path.display(),
+                                skipped_file.reason
+                            );
+                        }
+
+                        for directory in &undo_result.removed_directories {
+                            println!("  removed directory: {}", directory.display());
+                        }
+
+                        for failure in &undo_result.directory_failures {
+                            eprintln!(
+                                "  directory warning: {} ({})",
+                                failure.directory_path.display(),
+                                failure.reason
+                            );
+                        }
+
+                        println!();
+                        println!("{} files restored.", undo_result.restored_files.len());
+                        println!("{} files skipped.", undo_result.skipped_files.len());
+                        println!(
+                            "{} directories removed.",
+                            undo_result.removed_directories.len()
+                        );
+
+                        if undo_result.has_warnings() {
+                            eprintln!("Undo completed with warnings.");
+                            std::process::exit(7);
+                        }
+
+                        println!("Undo completed successfully.");
+                    }
+                    Err(error) => {
+                        eprintln!("Failed to undo latest operation: {error}");
+                        std::process::exit(1);
                     }
                 }
 

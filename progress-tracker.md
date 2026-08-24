@@ -81,6 +81,10 @@ Phase 0 - Repository Foundation
 - Added separate `undo` module with undo result types.
 - Added undo restore algorithm for recorded moves.
 - Added undo tests for successful restore, missing organized file, and occupied original path.
+- Added undo cleanup for empty directories recorded as created by SiftForge.
+- Added undo tests for removing empty created directories and preserving non-empty ones.
+- Added `siftforge undo` command for undoing the latest operation record.
+- Manually verified undo restores a moved file from the latest operation.
 
 ## In Progress
 
@@ -88,11 +92,10 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add cleanup for empty directories created by SiftForge.
-2. Add `undo` command.
-3. Improve operation timestamps.
-4. Add formatting and lint configuration.
-5. Add initial CI once the repository is connected to GitHub.
+1. Mark operation records after undo to avoid blind repeated undo attempts.
+2. Improve operation timestamps.
+3. Add formatting and lint configuration.
+4. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -213,6 +216,12 @@ Phase 0 - Repository Foundation
 - Added `undo::undo_operation` for restoring recorded moved files in reverse order.
 - Ran `cargo test`; 29 tests passed.
 - Ran `cargo check`; completed successfully.
+- Added undo cleanup for recorded created directories.
+- Ran `cargo test`; 31 tests passed.
+- Ran `cargo check`; completed successfully.
+- Added `undo` subcommand.
+- Ran `cargo run -- undo`; restored `Documents/history-check.pdf` to `history-check.pdf`.
+- Verified external test directory now contains `history-check.pdf` at the root again.
 
 ## Known Issues / Open Items
 

@@ -73,6 +73,8 @@ Phase 0 - Repository Foundation
 - Added `history::write_operation_record_to_dir` for pretty JSON history persistence to a provided directory.
 - Added history write/read test using a temporary directory.
 - Added `history::default_history_dir` for platform-appropriate local history storage.
+- Wired `--apply` to save operation history records after execution.
+- Manually verified history JSON is written to macOS Application Support history directory.
 
 ## In Progress
 
@@ -80,9 +82,9 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Wire apply operations to write history records.
-2. Add `history` command.
-3. Add `undo` command.
+1. Add `history` command.
+2. Add `undo` command.
+3. Improve operation timestamps.
 4. Add formatting and lint configuration.
 5. Add initial CI once the repository is connected to GitHub.
 
@@ -186,6 +188,10 @@ Phase 0 - Repository Foundation
 - Added default history directory resolver.
 - Ran `cargo test`; 24 unit tests and 1 integration test passed.
 - Ran `cargo check`; completed successfully with no warnings.
+- Wired apply flow to build and write an operation record.
+- Manually applied `history-check.pdf` in the external test directory.
+- Verified operation history file was written to `~/Library/Application Support/siftforge/history/`.
+- Verified JSON includes version, operation id, target directory, moved file, no failures, and `Completed` status.
 
 ## Known Issues / Open Items
 

@@ -1,5 +1,6 @@
 use clap::Parser;
 use siftforge::executor;
+use siftforge::history;
 use siftforge::planner;
 use siftforge::planner::ConflictResolution;
 use siftforge::scanner;
@@ -122,6 +123,26 @@ fn main() {
 
                     let failure_count =
                         directory_result.failures.len() + move_result.failures.len();
+
+                    let operation_record = history::build_operation_record(
+                        plan.target_directory.clone(),
+                        &directory_result,
+                        &move_result,
+                    );
+
+                    match history::default_history_dir().and_then(|history_dir| {
+                        history::write_operation_record_to_dir(&operation_record, &history_dir)
+                    }) {
+                        Ok(history_path) => {
+                            println!("Saved operation history.");
+                            println!("Operation ID: {}", operation_record.id);
+                            println!("History file: {}", history_path.display());
+                        }
+                        Err(error) => {
+                            eprintln!("Failed to save operation history: {error}");
+                            std::process::exit(1);
+                        }
+                    }
 
                     if directory_result.has_failures() || move_result.has_failures() {
                         eprintln!("Apply completed with {failure_count} failure(s).");

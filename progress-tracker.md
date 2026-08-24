@@ -78,6 +78,9 @@ Phase 0 - Repository Foundation
 - Added history record reading helpers.
 - Added `siftforge history` command.
 - Added latest operation lookup helper for undo.
+- Added separate `undo` module with undo result types.
+- Added undo restore algorithm for recorded moves.
+- Added undo tests for successful restore, missing organized file, and occupied original path.
 
 ## In Progress
 
@@ -85,7 +88,7 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add undo result types and restore algorithm.
+1. Add cleanup for empty directories created by SiftForge.
 2. Add `undo` command.
 3. Improve operation timestamps.
 4. Add formatting and lint configuration.
@@ -202,6 +205,13 @@ Phase 0 - Repository Foundation
 - Ran `cargo run -- history`; command listed saved operation `operation-1787563686578`.
 - Added `latest_operation_record_from_dir`.
 - Ran `cargo test`; latest-operation lookup test passed with the rest of the suite.
+- Ran `cargo check`; completed successfully.
+- Added `src/undo/mod.rs`.
+- Added undo result, restored file, skipped file, and directory failure types.
+- Exposed `undo` module through `src/lib.rs`.
+- Ran `cargo check`; completed successfully.
+- Added `undo::undo_operation` for restoring recorded moved files in reverse order.
+- Ran `cargo test`; 29 tests passed.
 - Ran `cargo check`; completed successfully.
 
 ## Known Issues / Open Items

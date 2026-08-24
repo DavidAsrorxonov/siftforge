@@ -68,6 +68,8 @@ Phase 0 - Repository Foundation
 - Added `serde` and `serde_json` dependencies for operation history serialization.
 - Added initial `history` module with operation record data structures.
 - Fixed history serialization derives; project checks cleanly with no warnings.
+- Added `history::build_operation_record` to convert executor results into serializable operation records.
+- Added history tests for completed operations and completed-with-errors operations.
 
 ## In Progress
 
@@ -75,12 +77,11 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add operation history constructors/conversion from executor results.
-2. Write successful apply operations to local history.
-3. Add `history` command.
-4. Add `undo` command.
-5. Add formatting and lint configuration.
-6. Add initial CI once the repository is connected to GitHub.
+1. Write apply operation records to local history.
+2. Add `history` command.
+3. Add `undo` command.
+4. Add formatting and lint configuration.
+5. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -173,6 +174,9 @@ Phase 0 - Repository Foundation
 - Ran `cargo check`; completed with one warning for unused `serde` imports.
 - Ran `cargo test`; 20 unit tests and 1 integration test passed.
 - Fixed history derives and reran `cargo check`; completed successfully with no warnings.
+- Added operation record builder.
+- Ran `cargo test`; 22 unit tests and 1 integration test passed.
+- Ran `cargo check`; completed successfully with no warnings.
 
 ## Known Issues / Open Items
 

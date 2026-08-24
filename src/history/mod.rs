@@ -1,6 +1,8 @@
 use crate::executor::{ExecutionFailure, ExecutionResult};
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::fs;
+use std::io;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct OperationRecord {
@@ -98,11 +100,28 @@ fn current_timestamp() -> String {
     format!("operation-{}", duration.as_millis())
 }
 
+pub fn write_operation_record_to_dir(
+    record: &OperationRecord,
+    history_dir: &Path,
+) -> io::Result<PathBuf> {
+    fs::create_dir_all(history_dir)?;
+
+    let file_path = history_dir.join(format!("{}.json", record.id));
+    let json = serde_json::to_string_pretty(record)
+        .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
+
+    fs::write(&file_path, json)?;
+
+    Ok(file_path)
+}
+
 #[cfg(test)]
 mod tests {
+    use super::write_operation_record_to_dir;
     use super::{build_operation_record, OperationStatus};
     use crate::executor::{ExecutedMove, ExecutionFailure, ExecutionResult};
     use crate::planner::ConflictResolution;
+    use std::fs;
     use std::path::PathBuf;
 
     #[test]
@@ -145,5 +164,25 @@ mod tests {
         assert_eq!(record.moves.len(), 0);
         assert_eq!(record.failures.len(), 1);
         assert_eq!(record.status, OperationStatus::CompletedWithErrors);
+    }
+
+    #[test]
+    fn writes_operation_record_to_history_directory() {
+        let temp_dir = tempfile::tempdir().unwrap();
+
+        let directory_result = ExecutionResult::new();
+        let move_result = ExecutionResult::new();
+
+        let record = build_operation_record(PathBuf::from("."), &directory_result, &move_result);
+        let written_path = write_operation_record_to_dir(&record, temp_dir.path()).unwrap();
+
+        assert!(written_path.exists());
+
+        let json = fs::read_to_string(written_path).unwrap();
+        let loaded: super::OperationRecord = serde_json::from_str(&json).unwrap();
+
+        assert_eq!(loaded.id, record.id);
+        assert_eq!(loaded.version, 1);
+        assert_eq!(loaded.status, OperationStatus::Completed);
     }
 }

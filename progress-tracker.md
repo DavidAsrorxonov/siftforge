@@ -77,6 +77,7 @@ Phase 0 - Repository Foundation
 - Manually verified history JSON is written to macOS Application Support history directory.
 - Added history record reading helpers.
 - Added `siftforge history` command.
+- Added latest operation lookup helper for undo.
 
 ## In Progress
 
@@ -84,10 +85,11 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add `undo` command.
-2. Improve operation timestamps.
-3. Add formatting and lint configuration.
-4. Add initial CI once the repository is connected to GitHub.
+1. Add undo result types and restore algorithm.
+2. Add `undo` command.
+3. Improve operation timestamps.
+4. Add formatting and lint configuration.
+5. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -198,6 +200,9 @@ Phase 0 - Repository Foundation
 - Ran `cargo test`; all tests passed.
 - Ran `cargo check`; completed successfully.
 - Ran `cargo run -- history`; command listed saved operation `operation-1787563686578`.
+- Added `latest_operation_record_from_dir`.
+- Ran `cargo test`; latest-operation lookup test passed with the rest of the suite.
+- Ran `cargo check`; completed successfully.
 
 ## Known Issues / Open Items
 

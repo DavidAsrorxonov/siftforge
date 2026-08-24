@@ -172,8 +172,15 @@ pub fn read_operation_records_from_dir(history_dir: &Path) -> io::Result<Vec<Ope
     Ok(records)
 }
 
+pub fn latest_operation_record_from_dir(history_dir: &Path) -> io::Result<Option<OperationRecord>> {
+    let records = read_operation_records_from_dir(history_dir)?;
+
+    Ok(records.into_iter().next())
+}
+
 #[cfg(test)]
 mod tests {
+    use super::latest_operation_record_from_dir;
     use super::read_operation_records_from_dir;
     use super::write_operation_record_to_dir;
     use super::{build_operation_record, OperationStatus};
@@ -265,5 +272,28 @@ mod tests {
 
         assert_eq!(records.len(), 1);
         assert_eq!(records[0].id, record.id);
+    }
+
+    #[test]
+    fn returns_latest_operation_record_from_history_directory() {
+        let temp_dir = tempfile::tempdir().unwrap();
+
+        let directory_result = ExecutionResult::new();
+        let move_result = ExecutionResult::new();
+
+        let mut older = build_operation_record(PathBuf::from("."), &directory_result, &move_result);
+        older.id = "operation-1000".to_string();
+
+        let mut newer = build_operation_record(PathBuf::from("."), &directory_result, &move_result);
+        newer.id = "operation-2000".to_string();
+
+        write_operation_record_to_dir(&older, temp_dir.path()).unwrap();
+        write_operation_record_to_dir(&newer, temp_dir.path()).unwrap();
+
+        let latest = latest_operation_record_from_dir(temp_dir.path())
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(latest.id, "operation-2000");
     }
 }

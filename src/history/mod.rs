@@ -1,5 +1,6 @@
 use crate::executor::{ExecutionFailure, ExecutionResult};
 use serde::{Deserialize, Serialize};
+use std::env;
 use std::fs;
 use std::io;
 use std::path::{Path, PathBuf};
@@ -115,6 +116,33 @@ pub fn write_operation_record_to_dir(
     Ok(file_path)
 }
 
+pub fn default_history_dir() -> io::Result<PathBuf> {
+    let base_dir = if cfg!(target_os = "windows") {
+        env::var_os("LOCALAPPDATA")
+            .map(PathBuf::from)
+            .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "LOCALAPPDATA is not set"))?
+    } else if cfg!(target_os = "macos") {
+        let home = env::var_os("HOME")
+            .map(PathBuf::from)
+            .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "HOME is not set"))?;
+
+        home.join("Library").join("Application Support")
+    } else {
+        match env::var_os("XDG_STATE_HOME") {
+            Some(path) => PathBuf::from(path),
+            None => {
+                let home = env::var_os("HOME")
+                    .map(PathBuf::from)
+                    .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "HOME is not set"))?;
+
+                home.join(".local").join("state")
+            }
+        }
+    };
+
+    Ok(base_dir.join("siftforge").join("history"))
+}
+
 #[cfg(test)]
 mod tests {
     use super::write_operation_record_to_dir;
@@ -184,5 +212,12 @@ mod tests {
         assert_eq!(loaded.id, record.id);
         assert_eq!(loaded.version, 1);
         assert_eq!(loaded.status, OperationStatus::Completed);
+    }
+
+    #[test]
+    fn default_history_dir_ends_with_siftforge_history() {
+        let history_dir = super::default_history_dir().unwrap();
+
+        assert!(history_dir.ends_with("siftforge/history"));
     }
 }

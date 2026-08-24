@@ -70,6 +70,8 @@ Phase 0 - Repository Foundation
 - Fixed history serialization derives; project checks cleanly with no warnings.
 - Added `history::build_operation_record` to convert executor results into serializable operation records.
 - Added history tests for completed operations and completed-with-errors operations.
+- Added `history::write_operation_record_to_dir` for pretty JSON history persistence to a provided directory.
+- Added history write/read test using a temporary directory.
 
 ## In Progress
 
@@ -77,11 +79,12 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Write apply operation records to local history.
-2. Add `history` command.
-3. Add `undo` command.
-4. Add formatting and lint configuration.
-5. Add initial CI once the repository is connected to GitHub.
+1. Add platform default history directory resolver.
+2. Wire apply operations to write history records.
+3. Add `history` command.
+4. Add `undo` command.
+5. Add formatting and lint configuration.
+6. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -176,6 +179,9 @@ Phase 0 - Repository Foundation
 - Fixed history derives and reran `cargo check`; completed successfully with no warnings.
 - Added operation record builder.
 - Ran `cargo test`; 22 unit tests and 1 integration test passed.
+- Ran `cargo check`; completed successfully with no warnings.
+- Added history record JSON writer.
+- Ran `cargo test`; 23 unit tests and 1 integration test passed.
 - Ran `cargo check`; completed successfully with no warnings.
 
 ## Known Issues / Open Items

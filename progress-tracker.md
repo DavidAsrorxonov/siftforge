@@ -65,6 +65,9 @@ Phase 0 - Repository Foundation
 - Added `src/lib.rs` and moved reusable modules behind the library crate API for integration testing.
 - Added full scan-plan-apply integration test in `tests/apply_pipeline.rs`.
 - Completed final manual Step 8 verification using the external test directory.
+- Added `serde` and `serde_json` dependencies for operation history serialization.
+- Added initial `history` module with operation record data structures.
+- Fixed history serialization derives; project checks cleanly with no warnings.
 
 ## In Progress
 
@@ -72,7 +75,7 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add operation history data structures.
+1. Add operation history constructors/conversion from executor results.
 2. Write successful apply operations to local history.
 3. Add `history` command.
 4. Add `undo` command.
@@ -162,6 +165,14 @@ Phase 0 - Repository Foundation
 - Ran final manual apply check with `final-check.png`.
 - Verified `final-check.png` was moved to `Images/final-check.png`.
 - Verified hidden files and incomplete downloads remained untouched.
+
+### 2026-08-24
+
+- Added history serialization dependencies.
+- Added initial `src/history/mod.rs`.
+- Ran `cargo check`; completed with one warning for unused `serde` imports.
+- Ran `cargo test`; 20 unit tests and 1 integration test passed.
+- Fixed history derives and reran `cargo check`; completed successfully with no warnings.
 
 ## Known Issues / Open Items
 

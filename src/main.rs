@@ -73,21 +73,38 @@ fn main() {
             }
             Command::Undo => {
                 match history::default_history_dir().and_then(|history_dir| {
-                    let record = history::latest_operation_record_from_dir(&history_dir)?
-                        .ok_or_else(|| {
-                            std::io::Error::new(
-                                std::io::ErrorKind::NotFound,
-                                "no operation history found",
-                            )
-                        })?;
+                    let record_path =
+                        history::latest_undoable_operation_record_path_from_dir(&history_dir)?
+                            .ok_or_else(|| {
+                                std::io::Error::new(
+                                    std::io::ErrorKind::NotFound,
+                                    "no undoable operation history found",
+                                )
+                            })?;
 
-                    Ok((record, history_dir))
+                    let record = history::read_operation_record(&record_path)?;
+
+                    Ok((record, record_path))
                 }) {
-                    Ok((record, _history_dir)) => {
+                    Ok((mut record, record_path)) => {
                         println!("Undoing operation: {}", record.id);
                         println!();
 
                         let undo_result = undo::undo_operation(&record);
+
+                        history::mark_operation_undone(
+                            &mut record,
+                            undo_result.restored_files.len(),
+                            undo_result.skipped_files.len(),
+                            undo_result.has_warnings(),
+                        );
+
+                        if let Err(error) =
+                            history::write_operation_record_to_path(&record, &record_path)
+                        {
+                            eprintln!("Failed to update operation history: {error}");
+                            std::process::exit(1);
+                        }
 
                         for restored_file in &undo_result.restored_files {
                             println!(

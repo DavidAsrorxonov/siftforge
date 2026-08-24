@@ -212,12 +212,96 @@ pub fn mark_operation_undone(
     });
 }
 
+pub fn latest_operation_record_path_from_dir(history_dir: &Path) -> io::Result<Option<PathBuf>> {
+    if !history_dir.exists() {
+        return Ok(None);
+    }
+
+    let mut paths = Vec::new();
+
+    for entry_result in fs::read_dir(history_dir)? {
+        let entry = entry_result?;
+        let path = entry.path();
+
+        if path.extension().and_then(|extension| extension.to_str()) == Some("json") {
+            paths.push(path);
+        }
+    }
+
+    paths.sort_by(|left, right| {
+        let left_name = left
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or("");
+        let right_name = right
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or("");
+
+        right_name.cmp(left_name)
+    });
+
+    Ok(paths.into_iter().next())
+}
+
+pub fn write_operation_record_to_path(record: &OperationRecord, path: &Path) -> io::Result<()> {
+    let json = serde_json::to_string_pretty(record)
+        .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
+
+    fs::write(path, json)
+}
+
+pub fn latest_undoable_operation_record_path_from_dir(
+    history_dir: &Path,
+) -> io::Result<Option<PathBuf>> {
+    if !history_dir.exists() {
+        return Ok(None);
+    }
+
+    let mut paths = Vec::new();
+
+    for entry_result in fs::read_dir(history_dir)? {
+        let entry = entry_result?;
+        let path = entry.path();
+
+        if path.extension().and_then(|extension| extension.to_str()) == Some("json") {
+            paths.push(path);
+        }
+    }
+
+    paths.sort_by(|left, right| {
+        let left_name = left
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or("");
+        let right_name = right
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or("");
+
+        right_name.cmp(left_name)
+    });
+
+    for path in paths {
+        let record = read_operation_record(&path)?;
+
+        if record.undo.is_none() {
+            return Ok(Some(path));
+        }
+    }
+
+    Ok(None)
+}
+
 #[cfg(test)]
 mod tests {
     use super::latest_operation_record_from_dir;
+    use super::latest_undoable_operation_record_path_from_dir;
+    use super::read_operation_record;
     use super::read_operation_records_from_dir;
     use super::write_operation_record_to_dir;
     use super::{build_operation_record, OperationStatus};
+    use super::{latest_operation_record_path_from_dir, write_operation_record_to_path};
     use super::{mark_operation_undone, UndoStatus};
     use crate::executor::{ExecutedMove, ExecutionFailure, ExecutionResult};
     use crate::planner::ConflictResolution;
@@ -346,5 +430,91 @@ mod tests {
         assert_eq!(undo.restored, 2);
         assert_eq!(undo.skipped, 1);
         assert_eq!(undo.status, UndoStatus::CompletedWithWarnings);
+    }
+    #[test]
+    fn returns_latest_operation_record_path_from_history_directory() {
+        let temp_dir = tempfile::tempdir().unwrap();
+
+        let directory_result = ExecutionResult::new();
+        let move_result = ExecutionResult::new();
+
+        let mut older = build_operation_record(PathBuf::from("."), &directory_result, &move_result);
+        older.id = "operation-1000".to_string();
+
+        let mut newer = build_operation_record(PathBuf::from("."), &directory_result, &move_result);
+        newer.id = "operation-2000".to_string();
+
+        let older_path = write_operation_record_to_dir(&older, temp_dir.path()).unwrap();
+        let newer_path = write_operation_record_to_dir(&newer, temp_dir.path()).unwrap();
+
+        let latest_path = latest_operation_record_path_from_dir(temp_dir.path())
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(latest_path, newer_path);
+        assert_ne!(latest_path, older_path);
+    }
+
+    #[test]
+    fn overwrites_operation_record_at_path() {
+        let temp_dir = tempfile::tempdir().unwrap();
+
+        let directory_result = ExecutionResult::new();
+        let move_result = ExecutionResult::new();
+
+        let mut record =
+            build_operation_record(PathBuf::from("."), &directory_result, &move_result);
+        let path = write_operation_record_to_dir(&record, temp_dir.path()).unwrap();
+
+        mark_operation_undone(&mut record, 1, 0, false);
+        write_operation_record_to_path(&record, &path).unwrap();
+
+        let loaded = read_operation_record(&path).unwrap();
+
+        assert!(loaded.undo.is_some());
+        assert_eq!(loaded.undo.unwrap().restored, 1);
+    }
+    #[test]
+    fn skips_already_undone_records_when_finding_latest_undoable_path() {
+        let temp_dir = tempfile::tempdir().unwrap();
+
+        let directory_result = ExecutionResult::new();
+        let move_result = ExecutionResult::new();
+
+        let mut older = build_operation_record(PathBuf::from("."), &directory_result, &move_result);
+        older.id = "operation-1000".to_string();
+
+        let mut newer = build_operation_record(PathBuf::from("."), &directory_result, &move_result);
+        newer.id = "operation-2000".to_string();
+
+        mark_operation_undone(&mut newer, 1, 0, false);
+
+        let older_path = write_operation_record_to_dir(&older, temp_dir.path()).unwrap();
+        write_operation_record_to_dir(&newer, temp_dir.path()).unwrap();
+
+        let latest_undoable = latest_undoable_operation_record_path_from_dir(temp_dir.path())
+            .unwrap()
+            .unwrap();
+
+        assert_eq!(latest_undoable, older_path);
+    }
+    #[test]
+    fn returns_none_when_no_undoable_operation_exists() {
+        let temp_dir = tempfile::tempdir().unwrap();
+
+        let directory_result = ExecutionResult::new();
+        let move_result = ExecutionResult::new();
+
+        let mut record =
+            build_operation_record(PathBuf::from("."), &directory_result, &move_result);
+        record.id = "operation-1000".to_string();
+
+        mark_operation_undone(&mut record, 1, 0, false);
+        write_operation_record_to_dir(&record, temp_dir.path()).unwrap();
+
+        let latest_undoable =
+            latest_undoable_operation_record_path_from_dir(temp_dir.path()).unwrap();
+
+        assert!(latest_undoable.is_none());
     }
 }

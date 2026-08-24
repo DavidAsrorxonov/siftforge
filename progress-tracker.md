@@ -87,6 +87,10 @@ Phase 0 - Repository Foundation
 - Manually verified undo restores a moved file from the latest operation.
 - Added undo metadata types to operation records.
 - Added helper to mark operation records as undone.
+- Added helpers to find the latest operation record path and overwrite an operation record at a specific path.
+- Wired undo flow to update the operation JSON with undo metadata.
+- Manually verified undo metadata is persisted into the history JSON after repeated undo.
+- Added latest undoable operation lookup that skips records already marked with undo metadata.
 
 ## In Progress
 
@@ -94,11 +98,9 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Persist undo metadata after running `siftforge undo`.
-2. Skip already-undone records when selecting latest operation.
-3. Improve operation timestamps.
-4. Add formatting and lint configuration.
-5. Add initial CI once the repository is connected to GitHub.
+1. Improve operation timestamps.
+2. Add formatting and lint configuration.
+3. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -229,6 +231,18 @@ Phase 0 - Repository Foundation
 - Added `history::mark_operation_undone`.
 - Ran `cargo test`; 32 tests passed.
 - Ran `cargo check`; completed successfully with no warnings.
+- Added latest operation record path lookup and record overwrite helpers.
+- Updated undo CLI flow to keep `record_path`, mutate the loaded record, and write it back after undo.
+- Fixed test import for `read_operation_record` and mutable record binding in `main.rs`.
+- Ran `cargo test`; 34 tests passed.
+- Ran `cargo check`; completed successfully with no warnings.
+- Ran `cargo run -- undo` against an already-undone operation.
+- Verified undo completed with warnings and updated the record with `CompletedWithWarnings`, `restored: 0`, and `skipped: 1`.
+- Added `latest_undoable_operation_record_path_from_dir`.
+- Added tests for skipping already-undone latest records and returning none when no undoable records exist.
+- Ran `cargo test`; all tests passed.
+- Ran `cargo check`; completed successfully.
+- Ran `cargo run -- undo`; command reported `no undoable operation history found` because the only saved operation is already marked undone.
 
 ## Known Issues / Open Items
 

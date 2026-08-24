@@ -143,8 +143,38 @@ pub fn default_history_dir() -> io::Result<PathBuf> {
     Ok(base_dir.join("siftforge").join("history"))
 }
 
+pub fn read_operation_record(path: &Path) -> io::Result<OperationRecord> {
+    let json = fs::read_to_string(path)?;
+    serde_json::from_str(&json).map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))
+}
+
+pub fn read_operation_records_from_dir(history_dir: &Path) -> io::Result<Vec<OperationRecord>> {
+    if !history_dir.exists() {
+        return Ok(Vec::new());
+    }
+
+    let mut records = Vec::new();
+
+    for entry_result in fs::read_dir(history_dir)? {
+        let entry = entry_result?;
+        let path = entry.path();
+
+        if path.extension().and_then(|extension| extension.to_str()) != Some("json") {
+            continue;
+        }
+
+        let record = read_operation_record(&path)?;
+        records.push(record);
+    }
+
+    records.sort_by(|left, right| right.id.cmp(&left.id));
+
+    Ok(records)
+}
+
 #[cfg(test)]
 mod tests {
+    use super::read_operation_records_from_dir;
     use super::write_operation_record_to_dir;
     use super::{build_operation_record, OperationStatus};
     use crate::executor::{ExecutedMove, ExecutionFailure, ExecutionResult};
@@ -219,5 +249,21 @@ mod tests {
         let history_dir = super::default_history_dir().unwrap();
 
         assert!(history_dir.ends_with("siftforge/history"));
+    }
+
+    #[test]
+    fn reads_operation_records_from_history_directory() {
+        let temp_dir = tempfile::tempdir().unwrap();
+
+        let directory_result = ExecutionResult::new();
+        let move_result = ExecutionResult::new();
+
+        let record = build_operation_record(PathBuf::from("."), &directory_result, &move_result);
+        write_operation_record_to_dir(&record, temp_dir.path()).unwrap();
+
+        let records = read_operation_records_from_dir(temp_dir.path()).unwrap();
+
+        assert_eq!(records.len(), 1);
+        assert_eq!(records[0].id, record.id);
     }
 }

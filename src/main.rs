@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use siftforge::executor;
 use siftforge::history;
 use siftforge::planner;
@@ -17,10 +17,58 @@ struct Cli {
     /// Apply the planned organization.
     #[arg(long)]
     apply: bool,
+
+    #[command(subcommand)]
+    command: Option<Command>,
+}
+
+#[derive(Debug, Subcommand)]
+enum Command {
+    /// Show recent SiftForge operations.
+    History,
 }
 
 fn main() {
     let cli = Cli::parse();
+
+    if let Some(command) = cli.command {
+        match command {
+            Command::History => {
+                match history::default_history_dir()
+                    .and_then(|history_dir| history::read_operation_records_from_dir(&history_dir))
+                {
+                    Ok(records) => {
+                        println!("Recent SiftForge operations:");
+                        println!();
+
+                        if records.is_empty() {
+                            println!("No operations found.");
+                        }
+
+                        for (index, record) in records.iter().enumerate() {
+                            let moved_count = record.moves.len();
+                            let moved_word = if moved_count == 1 { "moved" } else { "moved" };
+
+                            println!(
+                                "{}. {}   {}   {}   {}",
+                                index + 1,
+                                record.id,
+                                record.target_directory.display(),
+                                moved_count,
+                                moved_word
+                            );
+                        }
+                    }
+                    Err(error) => {
+                        eprintln!("Failed to read history: {error}");
+                        std::process::exit(1)
+                    }
+                }
+
+                return;
+            }
+        }
+    }
 
     match cli.directory {
         Some(directory) => match scanner::scan_directory(&directory) {

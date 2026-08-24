@@ -75,6 +75,8 @@ Phase 0 - Repository Foundation
 - Added `history::default_history_dir` for platform-appropriate local history storage.
 - Wired `--apply` to save operation history records after execution.
 - Manually verified history JSON is written to macOS Application Support history directory.
+- Added history record reading helpers.
+- Added `siftforge history` command.
 
 ## In Progress
 
@@ -82,11 +84,10 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add `history` command.
-2. Add `undo` command.
-3. Improve operation timestamps.
-4. Add formatting and lint configuration.
-5. Add initial CI once the repository is connected to GitHub.
+1. Add `undo` command.
+2. Improve operation timestamps.
+3. Add formatting and lint configuration.
+4. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -192,6 +193,11 @@ Phase 0 - Repository Foundation
 - Manually applied `history-check.pdf` in the external test directory.
 - Verified operation history file was written to `~/Library/Application Support/siftforge/history/`.
 - Verified JSON includes version, operation id, target directory, moved file, no failures, and `Completed` status.
+- Added history read helpers.
+- Added `history` subcommand.
+- Ran `cargo test`; all tests passed.
+- Ran `cargo check`; completed successfully.
+- Ran `cargo run -- history`; command listed saved operation `operation-1787563686578`.
 
 ## Known Issues / Open Items
 

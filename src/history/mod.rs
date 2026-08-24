@@ -16,6 +16,7 @@ pub struct OperationRecord {
     pub moves: Vec<HistoryMove>,
     pub failures: Vec<HistoryFailure>,
     pub status: OperationStatus,
+    pub undo: Option<UndoMetadata>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -37,6 +38,20 @@ pub struct HistoryFailure {
 pub enum OperationStatus {
     Completed,
     CompletedWithErrors,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct UndoMetadata {
+    pub attempted_at: String,
+    pub status: UndoStatus,
+    pub restored: usize,
+    pub skipped: usize,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub enum UndoStatus {
+    Completed,
+    CompletedWithWarnings,
 }
 
 pub fn build_operation_record(
@@ -81,6 +96,7 @@ pub fn build_operation_record(
         moves,
         failures,
         status,
+        undo: None,
     }
 }
 
@@ -178,12 +194,31 @@ pub fn latest_operation_record_from_dir(history_dir: &Path) -> io::Result<Option
     Ok(records.into_iter().next())
 }
 
+pub fn mark_operation_undone(
+    record: &mut OperationRecord,
+    restored: usize,
+    skipped: usize,
+    completed_with_warnings: bool,
+) {
+    record.undo = Some(UndoMetadata {
+        attempted_at: current_timestamp(),
+        status: if completed_with_warnings {
+            UndoStatus::CompletedWithWarnings
+        } else {
+            UndoStatus::Completed
+        },
+        restored,
+        skipped,
+    });
+}
+
 #[cfg(test)]
 mod tests {
     use super::latest_operation_record_from_dir;
     use super::read_operation_records_from_dir;
     use super::write_operation_record_to_dir;
     use super::{build_operation_record, OperationStatus};
+    use super::{mark_operation_undone, UndoStatus};
     use crate::executor::{ExecutedMove, ExecutionFailure, ExecutionResult};
     use crate::planner::ConflictResolution;
     use std::fs;
@@ -295,5 +330,21 @@ mod tests {
             .unwrap();
 
         assert_eq!(latest.id, "operation-2000");
+    }
+    #[test]
+    fn marks_operation_as_undone() {
+        let directory_result = ExecutionResult::new();
+        let move_result = ExecutionResult::new();
+
+        let mut record =
+            build_operation_record(PathBuf::from("."), &directory_result, &move_result);
+
+        mark_operation_undone(&mut record, 2, 1, true);
+
+        let undo = record.undo.unwrap();
+
+        assert_eq!(undo.restored, 2);
+        assert_eq!(undo.skipped, 1);
+        assert_eq!(undo.status, UndoStatus::CompletedWithWarnings);
     }
 }

@@ -127,6 +127,7 @@ mod tests {
             moves,
             failures: Vec::new(),
             status: OperationStatus::Completed,
+            undo: None,
         }
     }
 

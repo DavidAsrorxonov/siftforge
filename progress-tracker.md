@@ -85,6 +85,8 @@ Phase 0 - Repository Foundation
 - Added undo tests for removing empty created directories and preserving non-empty ones.
 - Added `siftforge undo` command for undoing the latest operation record.
 - Manually verified undo restores a moved file from the latest operation.
+- Added undo metadata types to operation records.
+- Added helper to mark operation records as undone.
 
 ## In Progress
 
@@ -92,10 +94,11 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Mark operation records after undo to avoid blind repeated undo attempts.
-2. Improve operation timestamps.
-3. Add formatting and lint configuration.
-4. Add initial CI once the repository is connected to GitHub.
+1. Persist undo metadata after running `siftforge undo`.
+2. Skip already-undone records when selecting latest operation.
+3. Improve operation timestamps.
+4. Add formatting and lint configuration.
+5. Add initial CI once the repository is connected to GitHub.
 
 ## Important Decisions
 
@@ -222,6 +225,10 @@ Phase 0 - Repository Foundation
 - Added `undo` subcommand.
 - Ran `cargo run -- undo`; restored `Documents/history-check.pdf` to `history-check.pdf`.
 - Verified external test directory now contains `history-check.pdf` at the root again.
+- Added `UndoMetadata` and `UndoStatus` to history records.
+- Added `history::mark_operation_undone`.
+- Ran `cargo test`; 32 tests passed.
+- Ran `cargo check`; completed successfully with no warnings.
 
 ## Known Issues / Open Items
 

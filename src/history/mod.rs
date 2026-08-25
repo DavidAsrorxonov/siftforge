@@ -1,4 +1,5 @@
 use crate::executor::{ExecutionFailure, ExecutionResult};
+use chrono::{SecondsFormat, Utc};
 use serde::{Deserialize, Serialize};
 use std::env;
 use std::fs;
@@ -109,12 +110,9 @@ fn history_failure_from_execution_failure(failure: &ExecutionFailure) -> History
 }
 
 fn current_timestamp() -> String {
-    let now = std::time::SystemTime::now();
-    let duration = now
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap_or_default();
-
-    format!("operation-{}", duration.as_millis())
+    Utc::now()
+        .to_rfc3339_opts(SecondsFormat::Millis, true)
+        .replace(':', "-")
 }
 
 pub fn write_operation_record_to_dir(
@@ -516,5 +514,13 @@ mod tests {
             latest_undoable_operation_record_path_from_dir(temp_dir.path()).unwrap();
 
         assert!(latest_undoable.is_none());
+    }
+
+    #[test]
+    fn generated_timestamp_is_windows_filename_safe() {
+        let timestamp = super::current_timestamp();
+
+        assert!(!timestamp.contains(':'));
+        assert!(timestamp.ends_with('Z'));
     }
 }

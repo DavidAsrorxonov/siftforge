@@ -91,6 +91,7 @@ Phase 0 - Repository Foundation
 - Wired undo flow to update the operation JSON with undo metadata.
 - Manually verified undo metadata is persisted into the history JSON after repeated undo.
 - Added latest undoable operation lookup that skips records already marked with undo metadata.
+- Improved operation IDs/timestamps from `operation-<millis>` to UTC RFC3339-style, Windows-safe filenames using `chrono`.
 
 ## In Progress
 
@@ -98,7 +99,7 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Improve operation timestamps.
+1. Fix history sorting so new timestamp IDs appear before legacy `operation-*` IDs.
 2. Add formatting and lint configuration.
 3. Add initial CI once the repository is connected to GitHub.
 
@@ -243,6 +244,10 @@ Phase 0 - Repository Foundation
 - Ran `cargo test`; all tests passed.
 - Ran `cargo check`; completed successfully.
 - Ran `cargo run -- undo`; command reported `no undoable operation history found` because the only saved operation is already marked undone.
+- Added `chrono` dependency and changed generated operation IDs to timestamp format like `2026-08-25T04-27-31.429Z`.
+- Ran `cargo check`; completed successfully.
+- Manually applied `timestamp-check.txt`; operation history was saved as `2026-08-25T04-27-31.429Z.json`.
+- Ran `cargo run -- history`; command listed both legacy and timestamped records, revealing a sorting issue where legacy `operation-*` IDs appear before newer timestamp IDs.
 
 ## Known Issues / Open Items
 

@@ -99,6 +99,7 @@ Phase 0 - Repository Foundation
 - Added `LICENSE`.
 - Added `CONTRIBUTING.md`.
 - Added `SECURITY.md`.
+- Added GitHub Actions CI workflow for formatting, check, clippy, and tests across Ubuntu, macOS, and Windows.
 
 ## In Progress
 
@@ -106,8 +107,8 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add initial CI once the repository is connected to GitHub.
-2. Continue toward configuration support.
+1. Continue toward configuration support.
+2. Add changelog and issue/PR templates when repository publishing is near.
 
 ## Important Decisions
 
@@ -267,6 +268,11 @@ Phase 0 - Repository Foundation
 - Added MIT `LICENSE`.
 - Added contributor guide with development checks and safety expectations.
 - Added security policy focused on local filesystem safety and history privacy.
+- Added `.github/workflows/ci.yml`.
+- Ran `cargo fmt --all -- --check`; completed successfully.
+- Ran `cargo check --all-targets`; completed successfully.
+- Ran `cargo clippy --all-targets -- -D warnings`; completed successfully.
+- Ran `cargo test --all-targets`; completed successfully.
 
 ## Known Issues / Open Items
 

@@ -112,6 +112,9 @@ Phase 0 - Repository Foundation
 - Wired organize flow to load and validate config before scanning.
 - Added user-defined extension rules from config.
 - User-defined extension rules now override built-in classification categories.
+- Added user-defined filename rules from config.
+- Filename starts-with and contains rules now take priority over user extension rules and built-ins.
+- Added `siftforge rules` command for displaying custom config rules and built-in categories.
 
 ## In Progress
 
@@ -119,9 +122,8 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add user-defined filename rules.
-2. Add `siftforge rules`.
-3. Add changelog and issue/PR templates when repository publishing is near.
+1. Add manual config behavior testing.
+2. Add changelog and issue/PR templates when repository publishing is near.
 
 ## Important Decisions
 
@@ -318,6 +320,11 @@ Phase 0 - Repository Foundation
 - Updated integration test to pass `Config::default()` into `build_plan`.
 - Added classifier tests for user extension rules overriding built-ins and fallback to built-ins when no user rule matches.
 - Ran `cargo fmt`, `cargo test`, `cargo check`, and `cargo clippy --all-targets -- -D warnings`; all completed successfully.
+- Updated config-aware classifier priority to filename starts-with, filename contains, user extension, then built-ins.
+- Added classifier tests for filename starts-with priority, filename contains priority, and extension fallback.
+- Ran `cargo fmt`, `cargo test`, `cargo check`, and `cargo clippy --all-targets -- -D warnings`; all completed successfully.
+- Added `rules` subcommand.
+- Manually verified `cargo run -- --config /Users/dovudxonasrorxonov/Desktop/Workspace/Testing/siftforge-directory-testing/siftforge.yml rules` lists `Screenshots`, `University`, and built-in categories.
 
 ## Known Issues / Open Items
 

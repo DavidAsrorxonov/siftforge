@@ -118,6 +118,26 @@ pub fn classify_file_name(file_name: &str) -> Classification {
 }
 
 pub fn classify_file_name_with_config(file_name: &str, config: &Config) -> Classification {
+    for (category_name, rule) in &config.categories {
+        if rule
+            .filename_starts_with
+            .iter()
+            .any(|prefix| file_name.starts_with(prefix))
+        {
+            return Classification::new(Category::Custom(category_name.clone()), None);
+        }
+    }
+
+    for (category_name, rule) in &config.categories {
+        if rule
+            .filename_contains
+            .iter()
+            .any(|needle| file_name.contains(needle))
+        {
+            return Classification::new(Category::Custom(category_name.clone()), None);
+        }
+    }
+
     let extension = detect_extension(file_name);
 
     if let Some(extension) = extension.as_deref() {
@@ -240,5 +260,86 @@ mod tests {
         let classification = classify_file_name_with_config("photo.png", &config);
 
         assert_eq!(classification.category, Category::Images);
+    }
+
+    #[test]
+    fn user_filename_starts_with_rule_overrides_extension_rule() {
+        let mut config = Config::default();
+
+        config.categories.insert(
+            "Screenshots".to_string(),
+            CategoryRule {
+                extensions: Vec::new(),
+                filename_starts_with: vec!["Screenshot".to_string()],
+                filename_contains: Vec::new(),
+            },
+        );
+
+        config.categories.insert(
+            "ImagesCustom".to_string(),
+            CategoryRule {
+                extensions: vec!["png".to_string()],
+                filename_starts_with: Vec::new(),
+                filename_contains: Vec::new(),
+            },
+        );
+
+        let classification = classify_file_name_with_config("Screenshot 2026-08-25.png", &config);
+
+        assert_eq!(
+            classification.category,
+            Category::Custom("Screenshots".to_string())
+        );
+    }
+
+    #[test]
+    fn user_filename_contains_rule_overrides_extension_rule() {
+        let mut config = Config::default();
+
+        config.categories.insert(
+            "University".to_string(),
+            CategoryRule {
+                extensions: Vec::new(),
+                filename_starts_with: Vec::new(),
+                filename_contains: vec!["assignment".to_string()],
+            },
+        );
+
+        config.categories.insert(
+            "DocumentsCustom".to_string(),
+            CategoryRule {
+                extensions: vec!["pdf".to_string()],
+                filename_starts_with: Vec::new(),
+                filename_contains: Vec::new(),
+            },
+        );
+
+        let classification = classify_file_name_with_config("math-assignment.pdf", &config);
+
+        assert_eq!(
+            classification.category,
+            Category::Custom("University".to_string())
+        );
+    }
+
+    #[test]
+    fn user_extension_rule_is_used_when_filename_rules_do_not_match() {
+        let mut config = Config::default();
+
+        config.categories.insert(
+            "University".to_string(),
+            CategoryRule {
+                extensions: vec!["pdf".to_string()],
+                filename_starts_with: vec!["Lecture".to_string()],
+                filename_contains: vec!["assignment".to_string()],
+            },
+        );
+
+        let classification = classify_file_name_with_config("syllabus.pdf", &config);
+
+        assert_eq!(
+            classification.category,
+            Category::Custom("University".to_string())
+        );
     }
 }

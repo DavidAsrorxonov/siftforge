@@ -37,6 +37,9 @@ enum Command {
 
     /// Create a starter siftforge.yml config file.
     Init,
+
+    /// Show effective organization rules.
+    Rules,
 }
 
 fn main() {
@@ -182,6 +185,62 @@ fn main() {
                     Err(error) => {
                         eprintln!("Failed to create config file: {error}");
                         std::process::exit(1);
+                    }
+                }
+
+                return;
+            }
+            Command::Rules => {
+                let current_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
+
+                match siftforge::config::load_effective_config(&current_dir, cli.config.as_deref())
+                {
+                    Ok(config) => {
+                        println!("Effective SiftForge rules:");
+                        println!();
+
+                        if config.categories.is_empty() {
+                            println!("Custom categories: none");
+                        } else {
+                            println!("Custom categories:");
+
+                            for (category_name, rule) in &config.categories {
+                                println!("   {category_name}");
+
+                                if !rule.filename_starts_with.is_empty() {
+                                    println!(
+                                        "   filename starts with: {}",
+                                        rule.filename_starts_with.join(", ")
+                                    )
+                                }
+
+                                if !rule.filename_contains.is_empty() {
+                                    println!(
+                                        "    filename contains: {}",
+                                        rule.filename_contains.join(", ")
+                                    );
+                                }
+
+                                if !rule.extensions.is_empty() {
+                                    println!("    extensions: {}", rule.extensions.join(", "));
+                                }
+                            }
+                        }
+
+                        println!();
+                        println!("Built-in categories:");
+                        println!("  Images");
+                        println!("  Videos");
+                        println!("  Audio");
+                        println!("  Documents");
+                        println!("  Archives");
+                        println!("  Code");
+                        println!("  Installers");
+                        println!("  Other");
+                    }
+                    Err(error) => {
+                        eprintln!("Failed to load rules: {error}");
+                        std::process::exit(4)
                     }
                 }
 

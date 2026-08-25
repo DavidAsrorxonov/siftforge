@@ -100,6 +100,12 @@ Phase 0 - Repository Foundation
 - Added `CONTRIBUTING.md`.
 - Added `SECURITY.md`.
 - Added GitHub Actions CI workflow for formatting, check, clippy, and tests across Ubuntu, macOS, and Windows.
+- Added `serde_yaml` dependency.
+- Added initial `config` module with schema types for behavior and category rules.
+- Added YAML config loading from an explicit path.
+- Added config loader tests for valid YAML, defaulted optional sections, and invalid YAML errors.
+- Added config validation for schema version, category path safety, empty rules, and extension formatting.
+- Added validation tests and fixed clippy initializer feedback.
 
 ## In Progress
 
@@ -107,8 +113,10 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Continue toward configuration support.
-2. Add changelog and issue/PR templates when repository publishing is near.
+1. Add `siftforge init`.
+2. Add `--config <path>`.
+3. Add user-defined rules.
+4. Add changelog and issue/PR templates when repository publishing is near.
 
 ## Important Decisions
 
@@ -273,6 +281,16 @@ Phase 0 - Repository Foundation
 - Ran `cargo check --all-targets`; completed successfully.
 - Ran `cargo clippy --all-targets -- -D warnings`; completed successfully.
 - Ran `cargo test --all-targets`; completed successfully.
+- Added configuration schema types in `src/config/mod.rs`.
+- Exposed `config` module from `src/lib.rs`.
+- Ran `cargo fmt`, `cargo check`, `cargo test`, and `cargo clippy --all-targets -- -D warnings`; all completed successfully.
+- Added `config::load_config_from_path`.
+- Added config load tests.
+- Ran `cargo fmt`, `cargo test`, `cargo check`, and `cargo clippy --all-targets -- -D warnings`; all completed successfully.
+- Added `config::validate_config`.
+- Added config validation tests for valid config, unsupported version, invalid category path, empty match conditions, and dotted extensions.
+- Fixed clippy `field_reassign_with_default` warning in config tests.
+- Ran `cargo fmt`, `cargo clippy --all-targets -- -D warnings`, `cargo test`, and `cargo check`; all completed successfully.
 
 ## Known Issues / Open Items
 

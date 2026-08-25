@@ -122,6 +122,7 @@ Phase 0 - Repository Foundation
 - Added GitHub bug report and feature request issue templates.
 - Added pull request template with safety checklist.
 - Added focused documentation for safety, configuration, and development.
+- Completed final MVP local/manual verification.
 
 ## In Progress
 
@@ -129,8 +130,8 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Run final MVP local/manual verification.
-2. Create session handover when stopping or switching sessions.
+1. Create session handover when stopping or switching sessions.
+2. Continue future hardening beyond MVP, if desired.
 
 ## Important Decisions
 
@@ -345,6 +346,12 @@ Phase 0 - Repository Foundation
 - Ran `cargo check --all-targets`; completed successfully.
 - Ran `cargo clippy --all-targets -- -D warnings`; completed successfully.
 - Ran `cargo test --all-targets`; 59 unit tests and 1 integration test passed.
+- Ran CLI basics: `--help`, `--version`, `history`, and `rules`; all behaved as expected.
+- Previewed external test directory with local config; custom categories loaded, `siftforge.yml` was skipped as SiftForge metadata, and four files were planned correctly.
+- Applied external test directory; custom-category files moved to `Screenshots` and `University`, built-in document fallback moved to `Documents`, and history was saved as `2026-08-25T15-32-14.204Z`.
+- Ran `history`; newest timestamped operation appeared first.
+- Ran `undo`; latest operation restored four files and removed the empty `Screenshots` and `University` directories created by SiftForge.
+- Ran `undo` again; next older undoable operation restored two files successfully, confirming already-undone records are skipped.
 - Added `docs/safety.md`.
 - Added `docs/configuration.md`.
 - Added `docs/development.md`.

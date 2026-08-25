@@ -115,6 +115,9 @@ Phase 0 - Repository Foundation
 - Added user-defined filename rules from config.
 - Filename starts-with and contains rules now take priority over user extension rules and built-ins.
 - Added `siftforge rules` command for displaying custom config rules and built-in categories.
+- Manually verified config rules affect planning for custom categories.
+- Discovered safety bug: `siftforge.yml` is currently classified as `Code` and planned for movement instead of being skipped as SiftForge metadata.
+- Fixed scanner to skip SiftForge config metadata files.
 
 ## In Progress
 
@@ -122,8 +125,8 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add manual config behavior testing.
-2. Add changelog and issue/PR templates when repository publishing is near.
+1. Add changelog and issue/PR templates when repository publishing is near.
+2. Continue release-readiness documentation polish.
 
 ## Important Decisions
 
@@ -325,6 +328,14 @@ Phase 0 - Repository Foundation
 - Ran `cargo fmt`, `cargo test`, `cargo check`, and `cargo clippy --all-targets -- -D warnings`; all completed successfully.
 - Added `rules` subcommand.
 - Manually verified `cargo run -- --config /Users/dovudxonasrorxonov/Desktop/Workspace/Testing/siftforge-directory-testing/siftforge.yml rules` lists `Screenshots`, `University`, and built-in categories.
+- Manually previewed external test directory with config-rule files.
+- Verified `Screenshots` and `University` custom categories appear in planning output.
+- Found `siftforge.yml` is still planned as `Code`; this violates the blueprint requirement to ignore SiftForge metadata and must be fixed before applying this preview.
+- Added `SkipReason::SiftForgeMetadata`.
+- Scanner now skips `siftforge.yml` and `siftforge.yaml`.
+- Added scanner regression test for skipping SiftForge config files.
+- Ran `cargo fmt`, `cargo test`, `cargo check`, and `cargo clippy --all-targets -- -D warnings`; all completed successfully.
+- Reran external test directory preview; `siftforge.yml` is skipped as SiftForge metadata and the incorrect `Code` planned move is gone.
 
 ## Known Issues / Open Items
 

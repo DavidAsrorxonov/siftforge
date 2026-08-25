@@ -19,6 +19,7 @@ pub enum SkipReason {
     Directory,
     Hidden,
     SystemMetadata,
+    SiftForgeMetadata,
     IncompleteDownload,
     NotAFile,
     ReadError(String),
@@ -30,6 +31,7 @@ impl SkipReason {
             SkipReason::Directory => "directory".to_string(),
             SkipReason::Hidden => "hidden".to_string(),
             SkipReason::SystemMetadata => "system metadata".to_string(),
+            SkipReason::SiftForgeMetadata => "SiftForge metadata".to_string(),
             SkipReason::IncompleteDownload => "incomplete download".to_string(),
             SkipReason::NotAFile => "not a regular file".to_string(),
             SkipReason::ReadError(error) => format!("read error: {error}"),
@@ -78,6 +80,14 @@ pub fn scan_directory(directory: &Path) -> io::Result<ScanResult> {
             continue;
         }
 
+        if is_siftforge_metadata(&name) {
+            skipped.push(SkippedEntry {
+                name,
+                reason: SkipReason::SiftForgeMetadata,
+            });
+            continue;
+        }
+
         if is_incomplete_download(&name) {
             skipped.push(SkippedEntry {
                 name,
@@ -122,6 +132,10 @@ fn is_system_metadata(name: &str) -> bool {
     matches!(name, ".DS_Store" | "Thumbs.db" | "desktop.ini")
 }
 
+fn is_siftforge_metadata(name: &str) -> bool {
+    matches!(name, "siftforge.yml" | "siftforge.yaml")
+}
+
 fn is_incomplete_download(name: &str) -> bool {
     let lower_name = name.to_lowercase();
 
@@ -130,4 +144,31 @@ fn is_incomplete_download(name: &str) -> bool {
         || lower_name.ends_with(".part")
         || lower_name.ends_with(".partial")
         || lower_name.ends_with(".tmp")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{scan_directory, SkipReason};
+
+    #[test]
+    fn skips_siftforge_config_files() {
+        let temp_dir = tempfile::tempdir().unwrap();
+
+        std::fs::write(temp_dir.path().join("siftforge.yml"), "version: 1").unwrap();
+        std::fs::write(temp_dir.path().join("siftforge.yaml"), "version: 1").unwrap();
+        std::fs::write(temp_dir.path().join("photo.png"), "image").unwrap();
+
+        let result = scan_directory(temp_dir.path()).unwrap();
+
+        assert_eq!(result.files.len(), 1);
+        assert_eq!(result.files[0].name, "photo.png");
+        assert_eq!(
+            result
+                .skipped
+                .iter()
+                .filter(|entry| matches!(entry.reason, SkipReason::SiftForgeMetadata))
+                .count(),
+            2
+        );
+    }
 }

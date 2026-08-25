@@ -96,6 +96,9 @@ Phase 0 - Repository Foundation
 - Added `rustfmt.toml` for consistent Rust formatting.
 - Ran clippy with warnings denied and fixed all reported lint issues.
 - Added full `README.md` documenting current usage, safety behavior, history, undo, development checks, and roadmap.
+- Added `LICENSE`.
+- Added `CONTRIBUTING.md`.
+- Added `SECURITY.md`.
 
 ## In Progress
 
@@ -103,9 +106,8 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add license and project metadata docs.
-2. Add initial CI once the repository is connected to GitHub.
-3. Continue toward configuration support.
+1. Add initial CI once the repository is connected to GitHub.
+2. Continue toward configuration support.
 
 ## Important Decisions
 
@@ -262,6 +264,9 @@ Phase 0 - Repository Foundation
 - Ran `cargo clippy -- -D warnings`; fixed `Default` implementations, `unwrap_or_default`, and duplicate `if` branch lint issues.
 - Reran `cargo clippy -- -D warnings`, `cargo check`, and `cargo test`; all completed successfully.
 - Added full root `README.md`.
+- Added MIT `LICENSE`.
+- Added contributor guide with development checks and safety expectations.
+- Added security policy focused on local filesystem safety and history privacy.
 
 ## Known Issues / Open Items
 

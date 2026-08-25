@@ -210,7 +210,7 @@ fn main() {
 
             match scanner::scan_directory(&directory) {
                 Ok(result) => {
-                    let plan = planner::build_plan(directory.clone(), result);
+                    let plan = planner::build_plan(directory.clone(), result, &config);
 
                     println!("Scanning: {}", plan.target_directory.display());
                     println!();

@@ -3,6 +3,7 @@ use std::path::PathBuf;
 
 use crate::classifier;
 use crate::classifier::Category;
+use crate::config::Config;
 use crate::scanner::ScanResult;
 use crate::scanner::SkippedEntry;
 
@@ -29,12 +30,12 @@ pub struct OrganizationPlan {
 }
 
 impl OrganizationPlan {
-    pub fn category_counts(&self) -> BTreeMap<&'static str, usize> {
+    pub fn category_counts(&self) -> BTreeMap<String, usize> {
         let mut counts = BTreeMap::new();
 
         for planned_move in &self.moves {
-            let cateogry_name = planned_move.category.folder_name();
-            let count = counts.entry(cateogry_name).or_insert(0);
+            let category_name = planned_move.category.folder_name();
+            let count = counts.entry(category_name).or_insert(0);
             *count += 1;
         }
 
@@ -49,12 +50,16 @@ impl OrganizationPlan {
     }
 }
 
-pub fn build_plan(target_directory: PathBuf, scan_result: ScanResult) -> OrganizationPlan {
+pub fn build_plan(
+    target_directory: PathBuf,
+    scan_result: ScanResult,
+    config: &Config,
+) -> OrganizationPlan {
     let mut directories_to_create = Vec::new();
     let mut moves = Vec::new();
 
     for file in scan_result.files {
-        let classification = classifier::classify_file_name(&file.name);
+        let classification = classifier::classify_file_name_with_config(&file.name, config);
         let category_directory = target_directory.join(classification.category.folder_name());
         let desired_destination_path = category_directory.join(&file.name);
         let (destination_path, conflict_resolution) =

@@ -1,4 +1,6 @@
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+use crate::config::Config;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Category {
     Images,
     Videos,
@@ -8,19 +10,21 @@ pub enum Category {
     Code,
     Installers,
     Other,
+    Custom(String),
 }
 
 impl Category {
-    pub fn folder_name(self) -> &'static str {
+    pub fn folder_name(&self) -> String {
         match self {
-            Category::Images => "Images",
-            Category::Videos => "Videos",
-            Category::Audio => "Audio",
-            Category::Documents => "Documents",
-            Category::Archives => "Archives",
-            Category::Code => "Code",
-            Category::Installers => "Installers",
-            Category::Other => "Other",
+            Category::Images => "Images".to_string(),
+            Category::Videos => "Videos".to_string(),
+            Category::Audio => "Audio".to_string(),
+            Category::Documents => "Documents".to_string(),
+            Category::Archives => "Archives".to_string(),
+            Category::Code => "Code".to_string(),
+            Category::Installers => "Installers".to_string(),
+            Category::Other => "Other".to_string(),
+            Category::Custom(name) => name.clone(),
         }
     }
 }
@@ -47,15 +51,15 @@ pub fn detect_extension(file_name: &str) -> Option<String> {
         return Some("tar.gz".to_string());
     }
 
-    if lower_name.ends_with("tar.bz2") {
+    if lower_name.ends_with(".tar.bz2") {
         return Some("tar.bz2".to_string());
     }
 
-    if lower_name.ends_with("tar.xz") {
+    if lower_name.ends_with(".tar.xz") {
         return Some("tar.xz".to_string());
     }
 
-    if lower_name.ends_with("tar.zst") {
+    if lower_name.ends_with(".tar.zst") {
         return Some("tar.zst".to_string());
     }
 
@@ -113,9 +117,31 @@ pub fn classify_file_name(file_name: &str) -> Classification {
     Classification::new(category, extension)
 }
 
+pub fn classify_file_name_with_config(file_name: &str, config: &Config) -> Classification {
+    let extension = detect_extension(file_name);
+
+    if let Some(extension) = extension.as_deref() {
+        for (category_name, rule) in &config.categories {
+            if rule
+                .extensions
+                .iter()
+                .any(|configured_extension| configured_extension.eq_ignore_ascii_case(extension))
+            {
+                return Classification::new(
+                    Category::Custom(category_name.clone()),
+                    Some(extension.to_string()),
+                );
+            }
+        }
+    }
+
+    classify_file_name(file_name)
+}
+
 #[cfg(test)]
 mod tests {
     use super::detect_extension;
+    use crate::config::{CategoryRule, Config};
 
     #[test]
     fn detects_simple_extension() {
@@ -140,7 +166,7 @@ mod tests {
         assert_eq!(detect_extension("filename."), None);
     }
 
-    use super::{classify_file_name, Category};
+    use super::{classify_file_name, classify_file_name_with_config, Category};
 
     #[test]
     fn classifies_image_file() {
@@ -183,5 +209,36 @@ mod tests {
 
         assert_eq!(classification.category, Category::Other);
         assert_eq!(classification.matched_extension, None);
+    }
+
+    #[test]
+    fn user_extension_rule_overrides_builtin_category() {
+        let mut config = Config::default();
+
+        config.categories.insert(
+            "University".to_string(),
+            CategoryRule {
+                extensions: vec!["pdf".to_string()],
+                filename_starts_with: Vec::new(),
+                filename_contains: Vec::new(),
+            },
+        );
+
+        let classification = classify_file_name_with_config("report.pdf", &config);
+
+        assert_eq!(
+            classification.category,
+            Category::Custom("University".to_string())
+        );
+        assert_eq!(classification.matched_extension, Some("pdf".to_string()));
+    }
+
+    #[test]
+    fn falls_back_to_builtin_category_when_no_user_rule_matches() {
+        let config = Config::default();
+
+        let classification = classify_file_name_with_config("photo.png", &config);
+
+        assert_eq!(classification.category, Category::Images);
     }
 }

@@ -110,6 +110,8 @@ Phase 0 - Repository Foundation
 - Manually verified `siftforge init` creates `siftforge.yml` and does not require running in the repo root.
 - Added effective config loading with explicit `--config` support and local `siftforge.yml` / `siftforge.yaml` lookup.
 - Wired organize flow to load and validate config before scanning.
+- Added user-defined extension rules from config.
+- User-defined extension rules now override built-in classification categories.
 
 ## In Progress
 
@@ -117,8 +119,9 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add user-defined rules.
-2. Add changelog and issue/PR templates when repository publishing is near.
+1. Add user-defined filename rules.
+2. Add `siftforge rules`.
+3. Add changelog and issue/PR templates when repository publishing is near.
 
 ## Important Decisions
 
@@ -309,6 +312,12 @@ Phase 0 - Repository Foundation
 - Ran `cargo clippy --all-targets -- -D warnings`; completed successfully.
 - Manually verified local `siftforge.yml` is loaded and reports 2 custom categories.
 - Manually verified missing explicit `--config /no/such/file.yml` fails before scanning.
+- Added `Category::Custom(String)`.
+- Added `classifier::classify_file_name_with_config`.
+- Updated planner to build plans using config-aware classification.
+- Updated integration test to pass `Config::default()` into `build_plan`.
+- Added classifier tests for user extension rules overriding built-ins and fallback to built-ins when no user rule matches.
+- Ran `cargo fmt`, `cargo test`, `cargo check`, and `cargo clippy --all-targets -- -D warnings`; all completed successfully.
 
 ## Known Issues / Open Items
 

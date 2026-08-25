@@ -1,5 +1,6 @@
 use std::fs;
 
+use siftforge::config::Config;
 use siftforge::executor;
 use siftforge::planner;
 use siftforge::scanner;
@@ -20,7 +21,7 @@ fn applies_full_scan_plan_and_move_pipeline() {
     fs::write(root.join("Documents").join("report.pdf"), "existing report").unwrap();
 
     let scan_result = scanner::scan_directory(root).unwrap();
-    let plan = planner::build_plan(root.to_path_buf(), scan_result);
+    let plan = planner::build_plan(root.to_path_buf(), scan_result, &Config::default());
 
     let directory_result = executor::create_plan_directories(&plan);
     let move_result = executor::execute_plan_moves(&plan);

@@ -30,6 +30,9 @@ enum Command {
 
     /// Undo the latest SiftForge operation.
     Undo,
+
+    /// Create a starter siftforge.yml config file.
+    Init,
 }
 
 fn main() {
@@ -152,6 +155,28 @@ fn main() {
                     }
                     Err(error) => {
                         eprintln!("Failed to undo latest operation: {error}");
+                        std::process::exit(1);
+                    }
+                }
+
+                return;
+            }
+
+            Command::Init => {
+                let config_path = std::env::current_dir()
+                    .map(|directory| directory.join("siftforge.yml"))
+                    .unwrap_or_else(|_| PathBuf::from("siftforge.yml"));
+
+                match siftforge::config::write_starter_config(&config_path) {
+                    Ok(()) => {
+                        println!("Created {}", config_path.display());
+                    }
+                    Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
+                        eprintln!("Config file already exists: {}", config_path.display());
+                        std::process::exit(1);
+                    }
+                    Err(error) => {
+                        eprintln!("Failed to create config file: {error}");
                         std::process::exit(1);
                     }
                 }

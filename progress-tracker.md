@@ -106,6 +106,8 @@ Phase 0 - Repository Foundation
 - Added config loader tests for valid YAML, defaulted optional sections, and invalid YAML errors.
 - Added config validation for schema version, category path safety, empty rules, and extension formatting.
 - Added validation tests and fixed clippy initializer feedback.
+- Added starter config generation and `siftforge init`.
+- Manually verified `siftforge init` creates `siftforge.yml` and does not require running in the repo root.
 
 ## In Progress
 
@@ -113,10 +115,9 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add `siftforge init`.
-2. Add `--config <path>`.
-3. Add user-defined rules.
-4. Add changelog and issue/PR templates when repository publishing is near.
+1. Add `--config <path>` and local config lookup.
+2. Add user-defined rules.
+3. Add changelog and issue/PR templates when repository publishing is near.
 
 ## Important Decisions
 
@@ -291,6 +292,13 @@ Phase 0 - Repository Foundation
 - Added config validation tests for valid config, unsupported version, invalid category path, empty match conditions, and dotted extensions.
 - Fixed clippy `field_reassign_with_default` warning in config tests.
 - Ran `cargo fmt`, `cargo clippy --all-targets -- -D warnings`, `cargo test`, and `cargo check`; all completed successfully.
+- Added `config::starter_config_yaml` and `config::write_starter_config`.
+- Added tests confirming starter config parses/validates and refuses to overwrite.
+- Added `init` subcommand.
+- Ran `cargo test`; 49 tests passed.
+- Ran `cargo check`; completed successfully.
+- Ran `cargo clippy --all-targets -- -D warnings`; completed successfully.
+- Manually ran `siftforge init` in `/Users/dovudxonasrorxonov/Desktop/Workspace/Testing/siftforge-directory-testing`; created `siftforge.yml`.
 
 ## Known Issues / Open Items
 

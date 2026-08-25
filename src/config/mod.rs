@@ -185,12 +185,56 @@ fn validate_extension(category_name: &str, extension: &str) -> Result<(), Config
     Ok(())
 }
 
+pub fn starter_config_yaml() -> &'static str {
+    r#"version: 1
+
+behavior:
+  unknown_files: other
+  include_hidden: false
+  recursive: false
+  follow_symlinks: false
+  conflict: rename
+
+categories:
+  Screenshots:
+    filename_starts_with:
+      - Screenshot
+      - Screen Shot
+    extensions:
+      - png
+      - jpg
+      - jpeg
+
+  University:
+    filename_contains:
+      - assignment
+      - lecture
+      - syllabus
+    extensions:
+      - pdf
+      - docx
+      - pptx
+"#
+}
+
+pub fn write_starter_config(path: &Path) -> io::Result<()> {
+    if path.exists() {
+        return Err(io::Error::new(
+            io::ErrorKind::AlreadyExists,
+            "config file already exists",
+        ));
+    }
+
+    fs::write(path, starter_config_yaml())
+}
+
 #[cfg(test)]
 mod tests {
     use super::{
         load_config_from_path, validate_config, CategoryRule, Config, ConflictStrategy,
         UnknownFilesBehavior,
     };
+    use super::{starter_config_yaml, write_starter_config};
 
     #[test]
     fn loads_valid_config_from_yaml_path() {
@@ -341,5 +385,25 @@ version: 1
         let error = validate_config(&config).unwrap_err();
 
         assert!(error.message.contains("must not start with '.'"));
+    }
+    #[test]
+    fn starter_config_yaml_is_valid_config() {
+        let config: Config = serde_yaml::from_str(starter_config_yaml()).unwrap();
+
+        validate_config(&config).unwrap();
+    }
+
+    #[test]
+    fn writes_starter_config_without_overwriting() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let config_path = temp_dir.path().join("siftforge.yml");
+
+        write_starter_config(&config_path).unwrap();
+
+        assert!(config_path.exists());
+
+        let error = write_starter_config(&config_path).unwrap_err();
+
+        assert_eq!(error.kind(), std::io::ErrorKind::AlreadyExists);
     }
 }

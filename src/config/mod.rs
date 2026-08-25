@@ -228,8 +228,39 @@ pub fn write_starter_config(path: &Path) -> io::Result<()> {
     fs::write(path, starter_config_yaml())
 }
 
+pub fn load_effective_config(
+    target_directory: &Path,
+    explicit_config_path: Option<&Path>,
+) -> io::Result<Config> {
+    let config = match explicit_config_path {
+        Some(path) => load_config_from_path(path)?,
+        None => {
+            let local_yml = target_directory.join("siftforge.yml");
+            let local_yaml = target_directory.join("siftforge.yaml");
+
+            if local_yml.exists() {
+                load_config_from_path(&local_yml)?
+            } else if local_yaml.exists() {
+                load_config_from_path(&local_yaml)?
+            } else {
+                Config::default()
+            }
+        }
+    };
+
+    validate_config(&config).map_err(|error| {
+        io::Error::new(
+            io::ErrorKind::InvalidData,
+            format!("invalid config: {}", error.message),
+        )
+    })?;
+
+    Ok(config)
+}
+
 #[cfg(test)]
 mod tests {
+    use super::load_effective_config;
     use super::{
         load_config_from_path, validate_config, CategoryRule, Config, ConflictStrategy,
         UnknownFilesBehavior,
@@ -405,5 +436,93 @@ version: 1
         let error = write_starter_config(&config_path).unwrap_err();
 
         assert_eq!(error.kind(), std::io::ErrorKind::AlreadyExists);
+    }
+
+    #[test]
+    fn loads_default_effective_config_when_no_file_exists() {
+        let temp_dir = tempfile::tempdir().unwrap();
+
+        let config = load_effective_config(temp_dir.path(), None).unwrap();
+
+        assert_eq!(config, Config::default());
+    }
+
+    #[test]
+    fn explicit_config_path_takes_priority() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let target_dir = temp_dir.path().join("target");
+        let explicit_path = temp_dir.path().join("custom.yml");
+
+        std::fs::create_dir(&target_dir).unwrap();
+
+        std::fs::write(
+            target_dir.join("siftforge.yml"),
+            r#"
+version: 1
+
+categories:
+  Local:
+    extensions:
+      - txt
+"#,
+        )
+        .unwrap();
+
+        std::fs::write(
+            &explicit_path,
+            r#"
+version: 1
+
+categories:
+  Explicit:
+    extensions:
+      - md
+"#,
+        )
+        .unwrap();
+
+        let config = load_effective_config(&target_dir, Some(&explicit_path)).unwrap();
+
+        assert!(config.categories.contains_key("Explicit"));
+        assert!(!config.categories.contains_key("Local"));
+    }
+
+    #[test]
+    fn loads_local_siftforge_yml_when_present() {
+        let temp_dir = tempfile::tempdir().unwrap();
+
+        std::fs::write(
+            temp_dir.path().join("siftforge.yml"),
+            r#"
+version: 1
+
+categories:
+  Local:
+    extensions:
+      - txt
+"#,
+        )
+        .unwrap();
+
+        let config = load_effective_config(temp_dir.path(), None).unwrap();
+
+        assert!(config.categories.contains_key("Local"));
+    }
+
+    #[test]
+    fn rejects_invalid_effective_config() {
+        let temp_dir = tempfile::tempdir().unwrap();
+
+        std::fs::write(
+            temp_dir.path().join("siftforge.yml"),
+            r#"
+version: 999
+"#,
+        )
+        .unwrap();
+
+        let error = load_effective_config(temp_dir.path(), None).unwrap_err();
+
+        assert_eq!(error.kind(), std::io::ErrorKind::InvalidData);
     }
 }

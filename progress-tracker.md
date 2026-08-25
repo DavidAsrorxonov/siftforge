@@ -108,6 +108,8 @@ Phase 0 - Repository Foundation
 - Added validation tests and fixed clippy initializer feedback.
 - Added starter config generation and `siftforge init`.
 - Manually verified `siftforge init` creates `siftforge.yml` and does not require running in the repo root.
+- Added effective config loading with explicit `--config` support and local `siftforge.yml` / `siftforge.yaml` lookup.
+- Wired organize flow to load and validate config before scanning.
 
 ## In Progress
 
@@ -115,9 +117,8 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Add `--config <path>` and local config lookup.
-2. Add user-defined rules.
-3. Add changelog and issue/PR templates when repository publishing is near.
+1. Add user-defined rules.
+2. Add changelog and issue/PR templates when repository publishing is near.
 
 ## Important Decisions
 
@@ -299,6 +300,15 @@ Phase 0 - Repository Foundation
 - Ran `cargo check`; completed successfully.
 - Ran `cargo clippy --all-targets -- -D warnings`; completed successfully.
 - Manually ran `siftforge init` in `/Users/dovudxonasrorxonov/Desktop/Workspace/Testing/siftforge-directory-testing`; created `siftforge.yml`.
+- Added `config::load_effective_config`.
+- Added tests for default config fallback, explicit config priority, local config lookup, and invalid effective config rejection.
+- Added `--config <path>` CLI option.
+- Fixed organize branch structure in `src/main.rs` while wiring config loading.
+- Ran `cargo test`; 53 tests passed.
+- Ran `cargo check`; completed successfully.
+- Ran `cargo clippy --all-targets -- -D warnings`; completed successfully.
+- Manually verified local `siftforge.yml` is loaded and reports 2 custom categories.
+- Manually verified missing explicit `--config /no/such/file.yml` fails before scanning.
 
 ## Known Issues / Open Items
 

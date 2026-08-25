@@ -1,6 +1,7 @@
 use crate::executor::{ExecutionFailure, ExecutionResult};
 use chrono::{SecondsFormat, Utc};
 use serde::{Deserialize, Serialize};
+use std::cmp::Ordering;
 use std::env;
 use std::fs;
 use std::io;
@@ -53,6 +54,53 @@ pub struct UndoMetadata {
 pub enum UndoStatus {
     Completed,
     CompletedWithWarnings,
+}
+
+enum OperationIdSortKey<'a> {
+    Timestamp(&'a str),
+    LegacyOperation(u128),
+    Other(&'a str),
+}
+
+fn operation_id_sort_key(id: &str) -> OperationIdSortKey<'_> {
+    if looks_like_timestamp_id(id) {
+        return OperationIdSortKey::Timestamp(id);
+    }
+
+    if let Some(value) = id
+        .strip_prefix("operation-")
+        .and_then(|value| value.parse::<u128>().ok())
+    {
+        return OperationIdSortKey::LegacyOperation(value);
+    }
+
+    OperationIdSortKey::Other(id)
+}
+
+fn looks_like_timestamp_id(id: &str) -> bool {
+    id.contains('T') && id.ends_with('Z')
+}
+
+fn compare_operation_ids_desc(left: &str, right: &str) -> Ordering {
+    match (operation_id_sort_key(left), operation_id_sort_key(right)) {
+        (OperationIdSortKey::Timestamp(left), OperationIdSortKey::Timestamp(right)) => {
+            right.cmp(left)
+        }
+        (OperationIdSortKey::LegacyOperation(left), OperationIdSortKey::LegacyOperation(right)) => {
+            right.cmp(&left)
+        }
+        (OperationIdSortKey::Timestamp(_), _) => Ordering::Less,
+        (_, OperationIdSortKey::Timestamp(_)) => Ordering::Greater,
+        (OperationIdSortKey::LegacyOperation(_), OperationIdSortKey::Other(_)) => Ordering::Less,
+        (OperationIdSortKey::Other(_), OperationIdSortKey::LegacyOperation(_)) => Ordering::Greater,
+        (OperationIdSortKey::Other(left), OperationIdSortKey::Other(right)) => right.cmp(left),
+    }
+}
+
+fn operation_id_from_path(path: &Path) -> &str {
+    path.file_stem()
+        .and_then(|name| name.to_str())
+        .unwrap_or("")
 }
 
 pub fn build_operation_record(
@@ -181,7 +229,7 @@ pub fn read_operation_records_from_dir(history_dir: &Path) -> io::Result<Vec<Ope
         records.push(record);
     }
 
-    records.sort_by(|left, right| right.id.cmp(&left.id));
+    records.sort_by(|left, right| compare_operation_ids_desc(&left.id, &right.id));
 
     Ok(records)
 }
@@ -227,16 +275,7 @@ pub fn latest_operation_record_path_from_dir(history_dir: &Path) -> io::Result<O
     }
 
     paths.sort_by(|left, right| {
-        let left_name = left
-            .file_name()
-            .and_then(|name| name.to_str())
-            .unwrap_or("");
-        let right_name = right
-            .file_name()
-            .and_then(|name| name.to_str())
-            .unwrap_or("");
-
-        right_name.cmp(left_name)
+        compare_operation_ids_desc(operation_id_from_path(left), operation_id_from_path(right))
     });
 
     Ok(paths.into_iter().next())
@@ -268,16 +307,7 @@ pub fn latest_undoable_operation_record_path_from_dir(
     }
 
     paths.sort_by(|left, right| {
-        let left_name = left
-            .file_name()
-            .and_then(|name| name.to_str())
-            .unwrap_or("");
-        let right_name = right
-            .file_name()
-            .and_then(|name| name.to_str())
-            .unwrap_or("");
-
-        right_name.cmp(left_name)
+        compare_operation_ids_desc(operation_id_from_path(left), operation_id_from_path(right))
     });
 
     for path in paths {
@@ -522,5 +552,31 @@ mod tests {
 
         assert!(!timestamp.contains(':'));
         assert!(timestamp.ends_with('Z'));
+    }
+
+    #[test]
+    fn sorts_timestamp_ids_before_legacy_operation_ids() {
+        let mut ids = [
+            "operation-1787563686578".to_string(),
+            "2026-08-25T04-27-31.429Z".to_string(),
+        ];
+
+        ids.sort_by(|left, right| super::compare_operation_ids_desc(left, right));
+
+        assert_eq!(ids[0], "2026-08-25T04-27-31.429Z");
+        assert_eq!(ids[1], "operation-1787563686578");
+    }
+
+    #[test]
+    fn sorts_timestamp_ids_newest_first() {
+        let mut ids = [
+            "2026-08-24T04-27-31.429Z".to_string(),
+            "2026-08-25T04-27-31.429Z".to_string(),
+        ];
+
+        ids.sort_by(|left, right| super::compare_operation_ids_desc(left, right));
+
+        assert_eq!(ids[0], "2026-08-25T04-27-31.429Z");
+        assert_eq!(ids[1], "2026-08-24T04-27-31.429Z");
     }
 }

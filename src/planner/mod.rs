@@ -88,7 +88,7 @@ pub fn resolve_available_destination(destination_path: PathBuf) -> (PathBuf, Con
     let parent = destination_path
         .parent()
         .map(PathBuf::from)
-        .unwrap_or_else(PathBuf::new);
+        .unwrap_or_default();
     let file_name = destination_path
         .file_name()
         .and_then(|name| name.to_str())

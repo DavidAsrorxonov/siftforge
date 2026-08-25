@@ -93,16 +93,19 @@ Phase 0 - Repository Foundation
 - Added latest undoable operation lookup that skips records already marked with undo metadata.
 - Improved operation IDs/timestamps from `operation-<millis>` to UTC RFC3339-style, Windows-safe filenames using `chrono`.
 - Fixed history sorting so timestamp-style IDs sort newest first and before legacy `operation-*` IDs.
+- Added `rustfmt.toml` for consistent Rust formatting.
+- Ran clippy with warnings denied and fixed all reported lint issues.
+- Added full `README.md` documenting current usage, safety behavior, history, undo, development checks, and roadmap.
 
 ## In Progress
 
-- Step 9 - History and undo.
+- Step 10 - Foundation polish, configuration, tests, packaging, and release readiness.
 
 ## Next Steps
 
-1. Add formatting and lint configuration.
+1. Add license and project metadata docs.
 2. Add initial CI once the repository is connected to GitHub.
-3. Continue toward Step 10 configuration, polish, tests, packaging, and release readiness.
+3. Continue toward configuration support.
 
 ## Important Decisions
 
@@ -254,6 +257,11 @@ Phase 0 - Repository Foundation
 - Ran `cargo test`; 39 tests passed.
 - Ran `cargo check`; completed successfully.
 - Ran `cargo run -- history`; timestamped operation now appears before legacy `operation-*` records.
+- Added root `rustfmt.toml`.
+- Ran `cargo fmt`, `cargo check`, and `cargo test`; all completed successfully with 39 tests passing.
+- Ran `cargo clippy -- -D warnings`; fixed `Default` implementations, `unwrap_or_default`, and duplicate `if` branch lint issues.
+- Reran `cargo clippy -- -D warnings`, `cargo check`, and `cargo test`; all completed successfully.
+- Added full root `README.md`.
 
 ## Known Issues / Open Items
 

@@ -38,6 +38,12 @@ impl ExecutionResult {
     }
 }
 
+impl Default for ExecutionResult {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl From<&PlannedMove> for ExecutedMove {
     fn from(planned_move: &PlannedMove) -> Self {
         Self {

@@ -45,6 +45,12 @@ impl UndoResult {
     }
 }
 
+impl Default for UndoResult {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub fn undo_operation(record: &OperationRecord) -> UndoResult {
     let mut result = UndoResult::new();
 

@@ -51,7 +51,7 @@ fn main() {
 
                         for (index, record) in records.iter().enumerate() {
                             let moved_count = record.moves.len();
-                            let moved_word = if moved_count == 1 { "moved" } else { "moved" };
+                            let moved_word = "moved";
 
                             println!(
                                 "{}. {}   {}   {}   {}",

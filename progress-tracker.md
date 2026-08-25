@@ -121,6 +121,7 @@ Phase 0 - Repository Foundation
 - Added `CHANGELOG.md`.
 - Added GitHub bug report and feature request issue templates.
 - Added pull request template with safety checklist.
+- Added focused documentation for safety, configuration, and development.
 
 ## In Progress
 
@@ -128,7 +129,7 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Continue release-readiness documentation polish.
+1. Run final MVP local/manual verification.
 2. Create session handover when stopping or switching sessions.
 
 ## Important Decisions
@@ -340,6 +341,13 @@ Phase 0 - Repository Foundation
 - Ran `cargo fmt`, `cargo test`, `cargo check`, and `cargo clippy --all-targets -- -D warnings`; all completed successfully.
 - Reran external test directory preview; `siftforge.yml` is skipped as SiftForge metadata and the incorrect `Code` planned move is gone.
 - Added changelog and GitHub issue/PR templates.
+- Ran `cargo fmt --all -- --check`; completed successfully.
+- Ran `cargo check --all-targets`; completed successfully.
+- Ran `cargo clippy --all-targets -- -D warnings`; completed successfully.
+- Ran `cargo test --all-targets`; 59 unit tests and 1 integration test passed.
+- Added `docs/safety.md`.
+- Added `docs/configuration.md`.
+- Added `docs/development.md`.
 - Ran `cargo fmt --all -- --check`; completed successfully.
 - Ran `cargo check --all-targets`; completed successfully.
 - Ran `cargo clippy --all-targets -- -D warnings`; completed successfully.

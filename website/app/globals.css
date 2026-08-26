@@ -3,20 +3,21 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f1eee5;
-  --foreground: #1c1b18;
-  --terminal-bg: #ece7dc;
-  --terminal-panel: #f8f4ea;
-  --terminal-code: #eee8dc;
-  --terminal-fg: #24221e;
-  --terminal-strong: #10100e;
-  --terminal-muted: #686255;
-  --terminal-border: #b8ad9a;
-  --terminal-accent: #3f6f55;
-  --terminal-accent-soft: #cde1d3;
-  --terminal-line: rgba(63, 111, 85, 0.16);
-  --terminal-glow: rgba(63, 111, 85, 0.28);
-  --terminal-hover: #e5ded1;
+  --background: #f5f3ea;
+  --foreground: #11160f;
+  --terminal-bg: #f3f1e8;
+  --terminal-panel: #fffdf6;
+  --terminal-code: #080c08;
+  --terminal-code-fg: #d7e7d2;
+  --terminal-fg: #11160f;
+  --terminal-strong: #020402;
+  --terminal-muted: #354435;
+  --terminal-border: #10180f;
+  --terminal-accent: #216b37;
+  --terminal-accent-soft: #d8ead8;
+  --terminal-line: rgba(33, 107, 55, 0.15);
+  --terminal-glow: rgba(33, 107, 55, 0.24);
+  --terminal-hover: #e0eadf;
 }
 
 @theme inline {
@@ -25,20 +26,21 @@
 }
 
 .dark {
-  --background: #080b0a;
-  --foreground: #e8e4d8;
-  --terminal-bg: #070a09;
-  --terminal-panel: #0d1110;
-  --terminal-code: #111716;
-  --terminal-fg: #d8d2c2;
-  --terminal-strong: #f4efe2;
-  --terminal-muted: #948d7c;
-  --terminal-border: #343b36;
-  --terminal-accent: #7ab893;
-  --terminal-accent-soft: #173324;
-  --terminal-line: rgba(122, 184, 147, 0.13);
-  --terminal-glow: rgba(122, 184, 147, 0.34);
-  --terminal-hover: #151d1a;
+  --background: #010201;
+  --foreground: #c9d7c5;
+  --terminal-bg: #010201;
+  --terminal-panel: #030603;
+  --terminal-code: #050905;
+  --terminal-code-fg: #d7e7d2;
+  --terminal-fg: #c9d7c5;
+  --terminal-strong: #edf7e8;
+  --terminal-muted: #71806f;
+  --terminal-border: #16351f;
+  --terminal-accent: #2f8b49;
+  --terminal-accent-soft: #06170a;
+  --terminal-line: rgba(47, 139, 73, 0.14);
+  --terminal-glow: rgba(47, 139, 73, 0.3);
+  --terminal-hover: #08130a;
 }
 
 body {
@@ -97,17 +99,12 @@ html {
 .terminal-readout {
   background:
     linear-gradient(90deg, var(--terminal-line) 1px, transparent 1px),
-    var(--terminal-code);
+    var(--terminal-panel);
   background-size: 18px 100%;
 }
 
 .terminal-logo-glow {
   filter: drop-shadow(0 0 18px var(--terminal-glow));
-}
-
-.blink-led {
-  animation: blink-led 1.2s steps(2, start) infinite;
-  box-shadow: 0 0 16px var(--terminal-glow);
 }
 
 .blink-cursor {
@@ -118,25 +115,6 @@ html {
   vertical-align: -0.14em;
   background: var(--terminal-accent);
   animation: blink-led 1s steps(2, start) infinite;
-}
-
-.signal-line {
-  position: relative;
-  overflow: hidden;
-}
-
-.signal-line::after {
-  position: absolute;
-  inset: 0;
-  content: "";
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in srgb, var(--terminal-accent) 22%, transparent),
-    transparent
-  );
-  animation: signal-sweep 2.8s linear infinite;
-  transform: translateX(-110%);
 }
 
 @keyframes blink-led {
@@ -151,16 +129,8 @@ html {
   }
 }
 
-@keyframes signal-sweep {
-  to {
-    transform: translateX(110%);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .blink-led,
-  .blink-cursor,
-  .signal-line::after {
+  .blink-cursor {
     animation: none;
   }
 }

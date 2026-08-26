@@ -1,12 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import { ExternalLink, Moon, Package, ScrollText, Sun } from "lucide-react";
+import {
+  Check,
+  Copy,
+  ExternalLink,
+  Moon,
+  Package,
+  ScrollText,
+  Sun,
+} from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { GitHub } from "@/components/icons/github";
+import { installCommands } from "@/constants/install-commands";
 import { siteLinks } from "@/constants/site-links";
 
 type Theme = "light" | "dark";
+type InstallMethod = (typeof installCommands)[number]["id"];
 
 const linkIcons = {
   github: GitHub,
@@ -16,6 +26,8 @@ const linkIcons = {
 };
 
 export default function Home() {
+  const [copied, setCopied] = useState(false);
+  const [installMethod, setInstallMethod] = useState<InstallMethod>("cargo");
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window === "undefined") {
       return "dark";
@@ -63,20 +75,59 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
+  useEffect(() => {
+    if (!copied) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => setCopied(false), 1500);
+
+    return () => window.clearTimeout(timeout);
+  }, [copied]);
+
+  const activeInstallCommand = useMemo(
+    () =>
+      installCommands.find((command) => command.id === installMethod) ??
+      installCommands[0],
+    [installMethod],
+  );
+
   const themeToggleLabel = useMemo(
     () => `Switch to ${theme === "dark" ? "light" : "dark"} mode`,
     [theme],
   );
 
+  const handleCopyCommand = async () => {
+    try {
+      if (!navigator.clipboard) {
+        throw new Error("Clipboard API is not available");
+      }
+
+      await navigator.clipboard.writeText(activeInstallCommand.command);
+    } catch {
+      const textArea = document.createElement("textarea");
+      textArea.value = activeInstallCommand.command;
+      textArea.setAttribute("readonly", "");
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+    }
+
+    setCopied(true);
+  };
+
   return (
     <main className="terminal-shell flex min-h-dvh items-center justify-center overflow-hidden px-3 py-3 font-mono text-(--terminal-fg) sm:px-6 sm:py-4">
       <section className="terminal-window grid h-[calc(100dvh-1.5rem)] w-full max-w-6xl grid-rows-[auto_1fr_auto] border border-(--terminal-border) bg-(--terminal-panel) sm:h-[calc(100dvh-2rem)]">
-        <header className="flex items-center justify-between border-b border-(--terminal-border) bg-(--terminal-code) px-3 py-2 text-xs text-(--terminal-muted) sm:px-4">
+        <header className="flex items-center justify-between border-b border-(--terminal-border) bg-(--terminal-code) px-3 py-2 text-xs text-(--terminal-code-fg) sm:px-4">
           <div className="flex min-w-0 items-center gap-2">
-            <span className="blink-led h-3 w-3 shrink-0 bg-(--terminal-accent)" />
-            <span className="truncate">siftforge://site</span>
+            <span className="h-3 w-3 shrink-0 bg-(--terminal-accent)" />
+            <span className="truncate">https://siftforge.dovudkhon.com</span>
           </div>
-          <div className="hidden items-center gap-3 text-(--terminal-muted) sm:flex">
+          <div className="hidden items-center gap-3 opacity-75 sm:flex">
             <span>mode:{theme}</span>
             <span>key:D</span>
           </div>
@@ -89,7 +140,7 @@ export default function Home() {
                 currentTheme === "dark" ? "light" : "dark",
               )
             }
-            className="inline-flex h-8 w-8 items-center justify-center border border-(--terminal-border) text-(--terminal-strong) transition-colors hover:bg-(--terminal-hover) focus:outline-none focus:ring-2 focus:ring-(--terminal-accent)"
+            className="inline-flex h-8 w-8 items-center justify-center border border-(--terminal-border) text-(--terminal-code-fg) transition-colors hover:border-(--terminal-accent) hover:text-(--terminal-accent) focus:outline-none focus:ring-2 focus:ring-(--terminal-accent)"
           >
             {theme === "dark" ? (
               <Sun aria-hidden="true" className="h-4 w-4" />
@@ -104,7 +155,7 @@ export default function Home() {
             <div className="flex items-center justify-between border-b border-(--terminal-border) pb-2 text-[10px] uppercase text-(--terminal-muted) sm:text-xs">
               <span>artifact preview</span>
               <span className="flex items-center gap-2">
-                <span className="blink-led h-2 w-2 bg-(--terminal-accent)" />
+                <span className="h-2 w-2 bg-(--terminal-accent)" />
                 active
               </span>
             </div>
@@ -139,15 +190,14 @@ export default function Home() {
                 <span className="text-(--terminal-accent)">ok</span> history:
                 local undo records
               </p>
-              <p className="signal-line h-4 border border-(--terminal-border)" />
+              <p className="h-4 border border-(--terminal-border) bg-(--terminal-accent-soft)" />
             </div>
           </div>
 
-          <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 text-left">
+          <div className="mx-auto flex min-w-0 w-full max-w-2xl flex-col gap-5 text-left">
             <div className="space-y-3">
               <p className="text-xs uppercase text-(--terminal-accent)">
                 &gt; Forge order from clutter
-                <span className="blink-cursor" />
               </p>
               <h1 className="text-3xl font-semibold leading-tight tracking-normal text-(--terminal-strong) sm:text-5xl">
                 Safe file organization for your terminal.
@@ -158,14 +208,52 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="border border-(--terminal-border) bg-(--terminal-code) text-sm text-(--terminal-strong)">
-              <div className="border-b border-(--terminal-border) px-3 py-1 text-[10px] uppercase text-(--terminal-muted)">
-                install
+            <div className="min-w-0 border border-(--terminal-border) bg-(--terminal-code) text-sm text-(--terminal-code-fg)">
+              <div className="flex items-center justify-between gap-2 border-b border-(--terminal-border) px-2 py-2 text-[10px] uppercase">
+                <div className="flex min-w-0 gap-1">
+                  {installCommands.map((command) => {
+                    const isActive = command.id === installMethod;
+
+                    return (
+                      <button
+                        key={command.id}
+                        type="button"
+                        aria-pressed={isActive}
+                        onClick={() => {
+                          setInstallMethod(command.id);
+                          setCopied(false);
+                        }}
+                        className={`border px-2 py-1 transition-colors focus:outline-none focus:ring-2 focus:ring-(--terminal-accent) ${
+                          isActive
+                            ? "border-(--terminal-accent) bg-(--terminal-accent) text-(--terminal-code)"
+                            : "border-(--terminal-border) text-(--terminal-code-fg) hover:border-(--terminal-accent)"
+                        }`}
+                      >
+                        {command.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <button
+                  type="button"
+                  aria-label={`Copy ${activeInstallCommand.label} install command`}
+                  title="Copy command"
+                  onClick={handleCopyCommand}
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center border border-(--terminal-border) text-(--terminal-code-fg) transition-colors hover:border-(--terminal-accent) hover:text-(--terminal-accent) focus:outline-none focus:ring-2 focus:ring-(--terminal-accent)"
+                >
+                  {copied ? (
+                    <Check aria-hidden="true" className="h-4 w-4" />
+                  ) : (
+                    <Copy aria-hidden="true" className="h-4 w-4" />
+                  )}
+                </button>
               </div>
-              <div className="px-4 py-3">
-                <span className="text-(--terminal-accent)">$</span> cargo
-                install siftforge
-                <span className="blink-cursor" />
+              <div className="min-w-0 px-4 py-3">
+                <code className="block min-h-5 whitespace-pre-wrap break-all leading-6">
+                  <span className="text-(--terminal-accent)">$</span>{" "}
+                  {activeInstallCommand.command}
+                  <span className="blink-cursor" />
+                </code>
               </div>
             </div>
 
@@ -193,7 +281,7 @@ export default function Home() {
           </div>
         </div>
 
-        <footer className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-(--terminal-border) bg-(--terminal-code) px-3 py-2 text-xs text-(--terminal-muted) sm:px-4">
+        <footer className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-(--terminal-border) bg-(--terminal-code) px-3 py-2 text-xs text-(--terminal-code-fg) sm:px-4">
           <span>preview first</span>
           <span>apply explicitly</span>
           <span>undo locally</span>

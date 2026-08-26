@@ -13,6 +13,9 @@
   --terminal-muted: #686255;
   --terminal-border: #b8ad9a;
   --terminal-accent: #3f6f55;
+  --terminal-accent-soft: #cde1d3;
+  --terminal-line: rgba(63, 111, 85, 0.16);
+  --terminal-glow: rgba(63, 111, 85, 0.28);
   --terminal-hover: #e5ded1;
 }
 
@@ -32,6 +35,9 @@
   --terminal-muted: #948d7c;
   --terminal-border: #343b36;
   --terminal-accent: #7ab893;
+  --terminal-accent-soft: #173324;
+  --terminal-line: rgba(122, 184, 147, 0.13);
+  --terminal-glow: rgba(122, 184, 147, 0.34);
   --terminal-hover: #151d1a;
 }
 
@@ -47,4 +53,114 @@ html {
 
 * {
   border-radius: 0;
+}
+
+.terminal-shell {
+  background:
+    linear-gradient(90deg, var(--terminal-line) 1px, transparent 1px),
+    linear-gradient(0deg, var(--terminal-line) 1px, transparent 1px),
+    radial-gradient(circle at 20% 20%, var(--terminal-accent-soft), transparent 28%),
+    var(--terminal-bg);
+  background-size:
+    44px 44px,
+    44px 44px,
+    100% 100%;
+}
+
+.terminal-window {
+  position: relative;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--terminal-border) 65%, transparent),
+    0 0 40px color-mix(in srgb, var(--terminal-glow) 55%, transparent);
+}
+
+.terminal-window::before {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  content: "";
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0,
+    transparent 5px,
+    color-mix(in srgb, var(--terminal-accent) 10%, transparent) 6px
+  );
+  opacity: 0.45;
+}
+
+.terminal-window > * {
+  position: relative;
+  z-index: 2;
+}
+
+.terminal-readout {
+  background:
+    linear-gradient(90deg, var(--terminal-line) 1px, transparent 1px),
+    var(--terminal-code);
+  background-size: 18px 100%;
+}
+
+.terminal-logo-glow {
+  filter: drop-shadow(0 0 18px var(--terminal-glow));
+}
+
+.blink-led {
+  animation: blink-led 1.2s steps(2, start) infinite;
+  box-shadow: 0 0 16px var(--terminal-glow);
+}
+
+.blink-cursor {
+  display: inline-block;
+  width: 0.65em;
+  height: 1em;
+  margin-left: 0.2em;
+  vertical-align: -0.14em;
+  background: var(--terminal-accent);
+  animation: blink-led 1s steps(2, start) infinite;
+}
+
+.signal-line {
+  position: relative;
+  overflow: hidden;
+}
+
+.signal-line::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--terminal-accent) 22%, transparent),
+    transparent
+  );
+  animation: signal-sweep 2.8s linear infinite;
+  transform: translateX(-110%);
+}
+
+@keyframes blink-led {
+  0%,
+  48% {
+    opacity: 1;
+  }
+
+  49%,
+  100% {
+    opacity: 0.28;
+  }
+}
+
+@keyframes signal-sweep {
+  to {
+    transform: translateX(110%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blink-led,
+  .blink-cursor,
+  .signal-line::after {
+    animation: none;
+  }
 }

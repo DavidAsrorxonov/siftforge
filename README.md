@@ -23,8 +23,12 @@ SiftForge currently has a working MVP flow:
 - Save local operation history
 - Show operation history
 - Undo the latest undoable operation
+- Generate starter configuration
+- Load and validate YAML configuration
+- Apply user-defined extension and filename rules
+- Build GitHub Release binary archives and installers
 
-Configuration files, custom rules, recursive organization, release packaging, and shell completions are not implemented yet.
+Configuration files and custom rules are implemented. Recursive organization and shell completions are not implemented yet.
 
 ## Safety Model
 
@@ -45,18 +49,30 @@ SiftForge does not delete user files as part of organization.
 
 ## Installation
 
-SiftForge is not published yet.
-
-For local development, run it with Cargo:
-
-```bash
-cargo run -- .
-```
-
-After release, the intended primary install path is:
+Install with Cargo:
 
 ```bash
 cargo install siftforge
+```
+
+Or install the latest GitHub Release binary with the shell installer:
+
+```bash
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/DovudxonN/siftforge/releases/latest/download/siftforge-installer.sh | sh
+```
+
+On Windows PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -c "irm https://github.com/DovudxonN/siftforge/releases/latest/download/siftforge-installer.ps1 | iex"
+```
+
+Prebuilt archives are also available from GitHub Releases for macOS, Linux, and Windows.
+
+Verify installation:
+
+```bash
+siftforge --version
 ```
 
 ## Usage
@@ -153,9 +169,62 @@ The scanner skips:
 - Hidden Unix-style names such as `.env` and `.DS_Store`
 - System metadata such as `.DS_Store`, `Thumbs.db`, and `desktop.ini`
 - Incomplete downloads ending with `.crdownload`, `.download`, `.part`, `.partial`, or `.tmp`
+- SiftForge config files such as `siftforge.yml` and `siftforge.yaml`
 - Non-regular filesystem entries
 
 Recursive mode is not implemented yet.
+
+## Configuration
+
+Create a starter config:
+
+```bash
+siftforge init
+```
+
+This writes `siftforge.yml` in the current directory and refuses to overwrite an existing file.
+
+SiftForge loads config in this order:
+
+1. explicit `--config <path>`
+2. `siftforge.yml` in the target directory
+3. `siftforge.yaml` in the target directory
+4. built-in defaults
+
+Example:
+
+```bash
+siftforge ~/Downloads --config ~/rules/siftforge.yml
+```
+
+Config rules support:
+
+- custom categories
+- extension matching
+- filename starts-with matching
+- filename contains matching
+
+Rule priority:
+
+1. user `filename_starts_with`
+2. user `filename_contains`
+3. user `extensions`
+4. built-in extension mappings
+5. `Other`
+
+View effective rules:
+
+```bash
+siftforge rules
+```
+
+With an explicit config:
+
+```bash
+siftforge --config ./siftforge.yml rules
+```
+
+More detail: [docs/configuration.md](docs/configuration.md).
 
 ## Conflict Handling
 
@@ -278,6 +347,7 @@ Current source modules:
 ```text
 src/
 ├── classifier/
+├── config/
 ├── executor/
 ├── history/
 ├── planner/
@@ -293,13 +363,10 @@ The library modules contain the reusable core behavior. `main.rs` contains the C
 
 Near-term work:
 
-- Add license file
-- Add CI
-- Improve README and documentation as features stabilize
-- Add configuration support
-- Add custom classification rules
 - Add stronger integration tests
-- Prepare release packaging
+- Improve release automation and installer verification
+- Improve CLI output polish
+- Add more platform-specific filesystem tests
 
 Longer-term possibilities:
 

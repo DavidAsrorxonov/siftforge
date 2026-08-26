@@ -1,26 +1,50 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f1eee5;
+  --foreground: #1c1b18;
+  --terminal-bg: #ece7dc;
+  --terminal-panel: #f8f4ea;
+  --terminal-code: #eee8dc;
+  --terminal-fg: #24221e;
+  --terminal-strong: #10100e;
+  --terminal-muted: #686255;
+  --terminal-border: #b8ad9a;
+  --terminal-accent: #3f6f55;
+  --terminal-hover: #e5ded1;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark {
+  --background: #080b0a;
+  --foreground: #e8e4d8;
+  --terminal-bg: #070a09;
+  --terminal-panel: #0d1110;
+  --terminal-code: #111716;
+  --terminal-fg: #d8d2c2;
+  --terminal-strong: #f4efe2;
+  --terminal-muted: #948d7c;
+  --terminal-border: #343b36;
+  --terminal-accent: #7ab893;
+  --terminal-hover: #151d1a;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+html {
+  overscroll-behavior: none;
+}
+
+* {
+  border-radius: 0;
 }

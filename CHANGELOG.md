@@ -18,6 +18,14 @@ This project follows Semantic Versioning.
 
 - Nothing yet.
 
+## [0.1.1] - 2026-08-26
+
+### Added
+
+- Added binary release automation for GitHub Releases using dist.
+- Added shell and PowerShell installers.
+- Added planned prebuilt archives for macOS, Linux, and Windows.
+
 ## [0.1.0] - 2026-08-26
 
 ### Added

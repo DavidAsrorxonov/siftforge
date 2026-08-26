@@ -58,13 +58,13 @@ cargo install siftforge
 Or install the latest GitHub Release binary with the shell installer:
 
 ```bash
-curl --proto '=https' --tlsv1.2 -LsSf https://github.com/DovudxonN/siftforge/releases/latest/download/siftforge-installer.sh | sh
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/DavidAsrorxonov/siftforge/releases/latest/download/siftforge-installer.sh | sh
 ```
 
 On Windows PowerShell:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -c "irm https://github.com/DovudxonN/siftforge/releases/latest/download/siftforge-installer.ps1 | iex"
+powershell -ExecutionPolicy Bypass -c "irm https://github.com/DavidAsrorxonov/siftforge/releases/latest/download/siftforge-installer.ps1 | iex"
 ```
 
 Prebuilt archives are also available from GitHub Releases for macOS, Linux, and Windows.

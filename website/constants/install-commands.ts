@@ -14,6 +14,6 @@ export const installCommands: InstallCommand[] = [
     id: "github",
     label: "GitHub binary",
     command:
-      "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/DovudxonN/siftforge/releases/latest/download/siftforge-installer.sh | sh",
+      "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/DavidAsrorxonov/siftforge/releases/latest/download/siftforge-installer.sh | sh",
   },
 ];

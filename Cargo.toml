@@ -4,9 +4,19 @@ version = "0.1.0"
 edition = "2021"
 rust-version="1.80"
 description="A safe, cross-platform CLI for organizing cluttered directories."
+repository = "https://github.com/DavidAsrorxonov/siftforge"
+homepage = "https://github.com/DavidAsrorxonov/siftforge"
+documentation = "https://github.com/DavidAsrorxonov/siftforge#readme"
 license="MIT"
 keywords=["cli", "files", "organizer", "downloads", "filesystem"]
 categories=["command-line-utilities", "filesystem"]
+exclude = [
+    "sessions/",
+    "session-handover.md",
+    "progress-tracker.md",
+    "siftforge-build-blueprint-rust.md",
+    "Cargo.toml.orig",
+]
 
 [[bin]]
 name="siftforge"

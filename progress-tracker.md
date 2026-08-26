@@ -123,6 +123,9 @@ Phase 0 - Repository Foundation
 - Added pull request template with safety checklist.
 - Added focused documentation for safety, configuration, and development.
 - Completed final MVP local/manual verification.
+- Published SiftForge `0.1.0` to crates.io.
+- Created GitHub release/tag `v0.1.0`.
+- Updated changelog for the `0.1.0` release and reset `Unreleased`.
 
 ## In Progress
 
@@ -130,8 +133,9 @@ Phase 0 - Repository Foundation
 
 ## Next Steps
 
-1. Create session handover when stopping or switching sessions.
-2. Continue future hardening beyond MVP, if desired.
+1. Verify public install with `cargo install siftforge`.
+2. Create session handover when stopping or switching sessions.
+3. Continue future hardening beyond MVP, if desired.
 
 ## Important Decisions
 
@@ -352,6 +356,13 @@ Phase 0 - Repository Foundation
 - Ran `history`; newest timestamped operation appeared first.
 - Ran `undo`; latest operation restored four files and removed the empty `Screenshots` and `University` directories created by SiftForge.
 - Ran `undo` again; next older undoable operation restored two files successfully, confirming already-undone records are skipped.
+- Ran `cargo package --list` and `cargo publish --dry-run`; packaging and verification succeeded.
+- Fixed Windows CI newline issue by adding `.gitattributes` line-ending normalization.
+- Published `siftforge` to crates.io as version `0.1.0`.
+- Pushed `v0.1.0` tag and created GitHub release.
+- Updated `CHANGELOG.md` with `## [0.1.0] - 2026-08-26` and reset `## [Unreleased]`.
+- Ran `cargo fmt --all -- --check`; completed successfully.
+- Ran `cargo check --all-targets`; completed successfully.
 - Added `docs/safety.md`.
 - Added `docs/configuration.md`.
 - Added `docs/development.md`.

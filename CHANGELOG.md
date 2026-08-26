@@ -8,6 +8,20 @@ This project follows Semantic Versioning.
 
 ### Added
 
+- Nothing yet.
+
+### Changed
+
+- Nothing yet.
+
+### Fixed
+
+- Nothing yet.
+
+## [0.1.0] - 2026-08-26
+
+### Added
+
 - Safe preview mode for directory organization.
 - Explicit `--apply` mode for moving files.
 - Built-in extension-based categories.
@@ -30,5 +44,4 @@ This project follows Semantic Versioning.
 - Recursive organization.
 - JSON output.
 - Shell completions.
-- Release packaging.
-
+- Prebuilt binary downloads.

@@ -31,3 +31,9 @@ siftforge-build-blueprint-rust.md
 progress-tracker.md
 session-handover.md
 sessions/
+
+# Website / Next.js
+website/node_modules/
+website/.next/
+website/out/
+website/.vercel/

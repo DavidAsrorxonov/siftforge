@@ -120,11 +120,11 @@ export default function Home() {
   };
 
   return (
-    <main className="terminal-shell flex min-h-dvh items-center justify-center overflow-hidden px-3 py-3 font-mono text-(--terminal-fg) sm:px-6 sm:py-4">
-      <section className="terminal-window grid h-[calc(100dvh-1.5rem)] w-full max-w-6xl grid-rows-[auto_1fr_auto] border border-(--terminal-border) bg-(--terminal-panel) sm:h-[calc(100dvh-2rem)]">
-        <header className="flex items-center justify-between border-b border-(--terminal-border) bg-(--terminal-code) px-3 py-2 text-xs text-(--terminal-code-fg) sm:px-4">
+    <main className="terminal-shell flex min-h-dvh items-center justify-center overflow-x-hidden px-3 py-3 font-mono text-(--terminal-fg) sm:px-6 sm:py-4">
+      <section className="terminal-window grid min-h-[calc(100dvh-1.5rem)] w-full max-w-6xl grid-rows-[auto_1fr_auto] border border-(--terminal-border) bg-(--terminal-panel) sm:h-[calc(100dvh-2rem)] sm:min-h-0">
+        <header className="flex h-11 items-center justify-between border-b border-(--terminal-border) bg-(--terminal-code) px-3 text-[11px] text-(--terminal-code-fg) sm:h-auto sm:px-4 sm:py-2 sm:text-xs">
           <div className="flex min-w-0 items-center gap-2">
-            <span className="h-3 w-3 shrink-0 bg-(--terminal-accent)" />
+            <span className="h-3 w-3 shrink-0 bg-(--terminal-accent) sm:h-3 sm:w-3" />
             <span className="truncate">https://siftforge.dovudkhon.com</span>
           </div>
           <div className="hidden items-center gap-3 opacity-75 sm:flex">
@@ -140,7 +140,7 @@ export default function Home() {
                 currentTheme === "dark" ? "light" : "dark",
               )
             }
-            className="inline-flex h-8 w-8 items-center justify-center border border-(--terminal-border) text-(--terminal-code-fg) transition-colors hover:border-(--terminal-accent) hover:text-(--terminal-accent) focus:outline-none focus:ring-2 focus:ring-(--terminal-accent)"
+            className="ml-2 inline-flex h-8 w-8 shrink-0 items-center justify-center border border-(--terminal-border) text-(--terminal-code-fg) transition-colors hover:border-(--terminal-accent) hover:text-(--terminal-accent) focus:outline-none focus:ring-2 focus:ring-(--terminal-accent)"
           >
             {theme === "dark" ? (
               <Sun aria-hidden="true" className="h-4 w-4" />
@@ -150,9 +150,9 @@ export default function Home() {
           </button>
         </header>
 
-        <div className="grid min-h-0 items-center gap-5 px-3 py-4 sm:px-8 sm:py-6 lg:grid-cols-[0.92fr_1.08fr] lg:gap-10 lg:px-12">
-          <div className="terminal-readout flex min-h-0 flex-col justify-between border border-(--terminal-border) p-3 sm:p-4">
-            <div className="flex items-center justify-between border-b border-(--terminal-border) pb-2 text-[10px] uppercase text-(--terminal-muted) sm:text-xs">
+        <div className="grid min-h-0 items-center gap-4 px-3 py-3 sm:gap-5 sm:px-8 sm:py-6 lg:grid-cols-[0.92fr_1.08fr] lg:gap-10 lg:px-12">
+          <div className="terminal-readout flex min-h-0 h-58 flex-col justify-between border border-(--terminal-border) p-3 sm:h-auto sm:p-4">
+            <div className="flex items-center justify-between border-b border-(--terminal-border) pb-2 text-[9px] uppercase text-(--terminal-muted) sm:text-xs">
               <span>artifact preview</span>
               <span className="flex items-center gap-2">
                 <span className="h-2 w-2 bg-(--terminal-accent)" />
@@ -160,8 +160,8 @@ export default function Home() {
               </span>
             </div>
 
-            <div className="flex flex-1 items-center justify-center py-4">
-              <div className="relative h-20 w-60 sm:h-30 sm:w-88 lg:h-40 lg:w-116">
+            <div className="flex flex-1 items-center justify-center py-2 sm:py-4">
+              <div className="relative h-14 w-48 sm:h-30 sm:w-88 lg:h-40 lg:w-116">
                 <Image
                   src="/logo/siftforge-light-no-bg.png"
                   alt="SiftForge"
@@ -181,7 +181,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="space-y-1 border-t border-(--terminal-border) pt-2 text-[10px] text-(--terminal-muted) sm:text-xs">
+            <div className="space-y-1 border-t border-(--terminal-border) pt-2 text-[9px] text-(--terminal-muted) sm:text-xs">
               <p>
                 <span className="text-(--terminal-accent)">ok</span> scan:
                 preview-only by default
@@ -190,25 +190,25 @@ export default function Home() {
                 <span className="text-(--terminal-accent)">ok</span> history:
                 local undo records
               </p>
-              <p className="h-4 border border-(--terminal-border) bg-(--terminal-accent-soft)" />
+              <p className="h-3 border border-(--terminal-border) bg-(--terminal-accent-soft) sm:h-4" />
             </div>
           </div>
 
-          <div className="mx-auto flex min-w-0 w-full max-w-2xl flex-col gap-5 text-left">
-            <div className="space-y-3">
-              <p className="text-xs uppercase text-(--terminal-accent)">
+          <div className="mx-auto flex min-w-0 w-full max-w-2xl flex-col gap-4 text-left sm:gap-5">
+            <div className="space-y-2 sm:space-y-3">
+              <p className="text-[11px] uppercase text-(--terminal-accent) sm:text-xs">
                 &gt; Forge order from clutter
               </p>
-              <h1 className="text-3xl font-semibold leading-tight tracking-normal text-(--terminal-strong) sm:text-5xl">
+              <h1 className="text-[2.35rem] font-semibold leading-[1.08] tracking-normal text-(--terminal-strong) sm:text-5xl">
                 Safe file organization for your terminal.
               </h1>
-              <p className="max-w-xl text-sm leading-6 text-(--terminal-muted) sm:text-base">
+              <p className="max-w-xl text-[13px] leading-6 text-(--terminal-muted) sm:text-base">
                 SiftForge previews every move, applies changes only when asked,
                 saves local history, and can undo the latest operation.
               </p>
             </div>
 
-            <div className="min-w-0 border border-(--terminal-border) bg-(--terminal-code) text-sm text-(--terminal-code-fg)">
+            <div className="min-w-0 border border-(--terminal-border) bg-(--terminal-code) text-[13px] text-(--terminal-code-fg) sm:text-sm">
               <div className="flex items-center justify-between gap-2 border-b border-(--terminal-border) px-2 py-2 text-[10px] uppercase">
                 <div className="flex min-w-0 gap-1">
                   {installCommands.map((command) => {
@@ -248,7 +248,7 @@ export default function Home() {
                   )}
                 </button>
               </div>
-              <div className="min-w-0 px-4 py-3">
+              <div className="min-w-0 px-3 py-3 sm:px-4">
                 <code className="block min-h-5 whitespace-pre-wrap break-all leading-6">
                   <span className="text-(--terminal-accent)">$</span>{" "}
                   {activeInstallCommand.command}
@@ -270,7 +270,7 @@ export default function Home() {
                     href={href}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex h-11 items-center justify-center gap-2 border border-(--terminal-border) bg-(--terminal-panel) px-3 text-sm font-medium text-(--terminal-strong) transition-colors hover:bg-(--terminal-hover) hover:text-(--terminal-accent) focus:outline-none focus:ring-2 focus:ring-(--terminal-accent) sm:justify-start"
+                    className="inline-flex h-10 items-center justify-center gap-2 border border-(--terminal-border) bg-(--terminal-panel) px-3 text-sm font-medium text-(--terminal-strong) transition-colors hover:bg-(--terminal-hover) hover:text-(--terminal-accent) focus:outline-none focus:ring-2 focus:ring-(--terminal-accent) sm:h-11 sm:justify-start"
                   >
                     <Icon aria-hidden="true" className="h-4 w-4" />
                     {label}
@@ -281,7 +281,7 @@ export default function Home() {
           </div>
         </div>
 
-        <footer className="flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-(--terminal-border) bg-(--terminal-code) px-3 py-2 text-xs text-(--terminal-code-fg) sm:px-4">
+        <footer className="grid grid-cols-3 border-t border-(--terminal-border) bg-(--terminal-code) px-3 py-2 text-center text-[10px] text-(--terminal-code-fg) sm:flex sm:flex-wrap sm:items-center sm:gap-x-4 sm:gap-y-1 sm:px-4 sm:text-xs">
           <span>preview first</span>
           <span>apply explicitly</span>
           <span>undo locally</span>
